@@ -1,0 +1,55 @@
+Outline installation instructions
+=================================
+
+Pending more complete documentation the process to install for test and development
+is outlined below. Production installation is left to the enthusiastic reader to
+work out :)
+
+1) Create a directory in which to build a Python virtual environment and create:
+
+ $ mkdir redflash
+ $ cd redflash
+ $ virtualenv .
+ 
+2) Clone redflash into this directory
+
+3) Install requirements with pip
+
+ $ source bin/activate
+ $ cd redflash
+ $ pip install -E .. -r requirements.txt
+ 
+4) Edit database and SMS gateway details in config/settings.py. For test purposes
+   comment out the ClickatellGateway and uncomment the DummyGateway (this is forced
+   automatically when the test suite is run)
+
+5) Create the redflash database in your chosen database engine and initialise:
+
+ $ python manage.py syncdb
+ 
+6) Run the server:
+
+ $ python manage.py runserver
+ 
+7) In order to have some data, allbeit rubbish, data (as used by the test-suite):
+
+ $ python manage.py loaddata testdata
+ 
+7) In browser, look at http://localhost:8000/admin and login with the user/pass you 
+   created in step 5
+   
+Testing with the Python client
+==============================
+
+In the ext directory you will find redflash.py which contains a Python client wrapper. Put
+on your Python path and use as follows:
+
+ from redflash import RedFlashClient
+ 
+ rfc = RedFlashClient(rf_url = 'http://REDFLASH.SERVER.ADDRESS', api_key = 'A KEY FROM THE APIUser MODEL')
+ rfc.notify_contact('contact-slug', 'message')
+ rfc.notify_group('group-slug', 'message')
+ 
+ # additional key-word arguments are passed into the context used to process
+ # the message template associated with the event (see Events in the admin).
+ rfc.fire_event('event-slug', **additional_arguments)
