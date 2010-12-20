@@ -2,6 +2,10 @@
 # All Rights Reserved
 # See LICENSE for details
 
+# To use with gunicorn
+#
+# /path/to/gunicorn -w 4 redflash_wsgi:application
+
 import os
 import sys
 
