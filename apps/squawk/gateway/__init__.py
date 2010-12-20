@@ -7,14 +7,14 @@ import re
 import urllib
 import types
 
-def _log(notification_id, gateway_id, api_user, notification_type, notification_slug, 
+def _log(notification_id, gateway_response, api_user, notification_type, notification_slug, 
          contact, send_ok, message):
         # really really nasty hack because the gateway class is set in settings,
         # so the import fails as it is called before settings has fully instantiated
         # Better is to have the class in settings as  a String and sort out later
         from squawk.models import AuditLog
         ml = AuditLog(notification_id = notification_id,
-                        gateway_id = gateway_id,
+                        gateway_response = gateway_response,
                         api_user = api_user,
                         notification_type = notification_type,
                         notification_slug = notification_slug,

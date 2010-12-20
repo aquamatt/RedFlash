@@ -68,13 +68,13 @@ class EventAdmin(VersionAdmin):
     )
 
 class AuditLogAdmin(admin.ModelAdmin):
-    list_display = ('timestamp', 'notification_id', 'gateway_id', 'notification_type', 
+    list_display = ('timestamp', 'notification_id', 'gateway_response', 'notification_type', 
                     'notification_slug', 'contact', 'message', 'send_ok', 'delivery_confirmed')
 
     fieldsets = (
                  ( None,
                    { 'fields' : (
-                                 ('notification_id', 'gateway_id'),
+                                 ('notification_id', 'gateway_response'),
                                  ('api_user', 'contact'),
                                  ('notification_type','notification_slug'),
                                  'message',

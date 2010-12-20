@@ -98,7 +98,7 @@ class AuditLog(models.Model):
 """
     timestamp = models.DateTimeField(auto_now_add = True)
     notification_id = models.CharField(max_length = 40, help_text = "RedFlash generated ID")
-    gateway_id = models.CharField(max_length = 40, blank = True)
+    gateway_response = models.CharField(max_length = 40, blank = True)
     api_user = models.ForeignKey(APIUser, help_text = "API User used to send the message")
     notification_type = models.CharField(max_length = 10, choices = RECIPIENT_CHOICES)
     notification_slug = models.CharField(max_length = 100, help_text = "slug of the contact or group")
