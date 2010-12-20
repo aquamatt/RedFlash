@@ -38,6 +38,13 @@ work out :)
 7) In browser, look at http://localhost:8000/admin and login with the user/pass you 
    created in step 5
    
+Local configuration
+===================
+
+The file /etc/redflash.py is imported by settings.py at the end so can be used
+to override any settings on a per-host basis. You can, for example, put your
+Clickatell user and password in there.
+   
 Testing with the Python client
 ==============================
 
