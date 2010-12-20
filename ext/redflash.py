@@ -5,6 +5,9 @@
 import urllib
 
 class RedFlashClient(object):
+    """ Instantiate a RedFlashClient to send messages easily from any Python 
+application. """
+
     def __init__(self, rf_url, api_key):
         """ Create a client that connects to the specified RedFlash server
 at rf_url using the api_key. """
@@ -12,6 +15,8 @@ at rf_url using the api_key. """
         self.api_key = api_key
         if not api_key:
             raise Exception("API KEY must be non-empty and not null")
+        if not rf_url:
+            raise Exception("RedFlash URL must be non-empty and not null")
         
     def _send(self, ctype, slug, data):
         data['api_key'] = self.api_key
