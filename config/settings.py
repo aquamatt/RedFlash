@@ -6,8 +6,16 @@
 import os
 SITE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
-from squawk.gateway import ClickatellGateway as GATEWAY
+
 #from squawk.gateway import DummyGateway as GATEWAY
+from squawk.gateway import ClickatellGateway as GATEWAY
+GATEWAY_URL = "https://api.clickatell.com/http/sendmsg"
+GATEWAY_USER = '<YOUR USER NAME>'
+GATEWAY_PASSWORD = '<YOUR PASSWORD>'
+GATEWAY_API_ID = '<YOUR API ID>'
+# if set, this is the number from which SMS appear to originate
+# With Clickatell, this must be a number registered with them
+# GATEWAY_ORIGIN_NUMBER = "<ORIGIN NUMBER>"
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG

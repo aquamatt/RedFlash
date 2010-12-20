@@ -2,6 +2,8 @@
 # All Rights Reserved
 # See LICENSE for details
 """ SMS gateway implementations
+
+@todo refactor, refactor, refactor. Nasty stuff here.
 """
 import re
 import urllib
@@ -57,6 +59,8 @@ after pre-determined time. It also allows you to check whether a message has bee
 delivered. Even better you can specify a callback,
 so if RedFlash is externally exposed we don't have to poll. Can then mark message 
 delivery in log.   
+
+@todo refactor. This is 'orrible
 """
     SEND_OK_RE = re.compile("ID: ([a-z,0-9,A-Z]*)$")
     SEND_OK_MULTI_RE = re.compile("ID: ([a-z,0-9,A-Z]*) To: ([0-9]*)$")

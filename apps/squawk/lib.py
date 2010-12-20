@@ -24,16 +24,11 @@ GATEWAY = settings.GATEWAY()
 def create_notification_id():
     return str(uuid.uuid4()).replace('-','')        
         
-def message_contact(api_user, user_slug, message, notification_id = None):
+def message_contact(api_user, user_slug, message):
     """ Message a single contact. 
-Notification ID is the ID for this RedFlash message and links all 
-messages sent to all recipients. If not supplied, it will be generated
-and returned.
-    
 @todo some handling if GATEWAY is None or invalid
 """ 
-    if notification_id == None:
-        notification_id = create_notification_id()
+    notification_id = create_notification_id()
         
     try:
         contact = Contact.objects.get(slug = user_slug)
@@ -44,18 +39,12 @@ and returned.
     except Contact.DoesNotExist:
         raise InvalidContactError("%s not found" % user_slug)
     
-    return notification_id
-    
-def message_group(api_user, group_slug, message, notification_id = None):
+def message_group(api_user, group_slug, message):
     """ Message a group of contacts. 
-Notification ID is the ID for this RedFlash message and links all 
-messages sent to all recipients. If not supplied, it will be generated
-and returned.
 @todo some handling if GATEWAY is None or invalid
 @todo bare exception caught on GATEWAY.send: lazy
 """
-    if notification_id == None:
-        notification_id = create_notification_id()
+    notification_id = create_notification_id()
     
     SEND_ERROR = None
     try:
@@ -72,20 +61,13 @@ and returned.
         
     if SEND_ERROR:
         raise PartialSendError("Error in sending message: %s" % SEND_ERROR)
-    
-    return notification_id
 
-def fire_event(api_user, event_slug, post_args, notification_id = None):
+def fire_event(api_user, event_slug, post_args):
     """ Fire an event and message associated users and groups. 
-Notification ID is the ID for this RedFlash message and links all 
-messages sent to all recipients. If not supplied, it will be generated
-and returned.
-
 @todo inefficient double read of group/contact records - one in this loop
 and one in the message_[contact|group] methods
 @todo passed exceptions - PUT IN LOGGING, DAMNIT!"""
-    if notification_id == None:
-        notification_id = create_notification_id()
+    notification_id = create_notification_id()
     
     try:
         event = Event.objects.get(slug = event_slug)
@@ -108,5 +90,3 @@ and one in the message_[contact|group] methods
     contacts = list(set(contacts))
 
     GATEWAY.send(api_user, notification_id, 'event', event_slug, contacts, message)
-    
-    return notification_id 

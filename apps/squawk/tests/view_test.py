@@ -142,7 +142,9 @@ class TestGroupHandlers(TestCase):
         self.assertEqual(response.content, "Empty message")
 
 #    def test_post_to_group_with_some_invalid_users(self):
-#        """ @todo: Would need to bork the DB to do this so not testing... """
+#        """ @todo: Would need to bork the DB to do this so not testing... actually...
+# on second thoughts... this occurs if the phone number is bad and the gateway returns
+# error. Need to sort this test."""
 #        response = self.client.post('/group/demo-partial-group/', data = {'api_key':self.valid_key,
 #                                                                   'message':'The message'})
 #        self.assertEqual(response.status_code, 202)
