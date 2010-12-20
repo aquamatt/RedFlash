@@ -35,7 +35,6 @@ at rf_url using the api_key. """
         
         return code
     
-    
     def fire_event(self, slug, **data):
         """ Fire an event on the RedFlash server at rf_url """
         response = self._send('event', slug, data)
