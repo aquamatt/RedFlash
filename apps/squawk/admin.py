@@ -9,6 +9,8 @@ from squawk.models import AuditLog
 class ContactAdmin(VersionAdmin):
     prepopulated_fields = {'slug': ("name",)}
     list_display = ('name', 'slug', 'number', 'enabled')
+    search_fields = ('name', 'slug', 'number')
+    list_filter = ('enabled',)
     fieldsets = (
         (None,
             {'fields':(
@@ -25,6 +27,8 @@ class ContactAdmin(VersionAdmin):
 class ContactGroupAdmin(VersionAdmin):
     prepopulated_fields = {'slug': ("name",)}
     list_display = ('name', 'slug', 'enabled')
+    search_fields = ('name', 'slug')
+    list_filter = ('enabled',)
     filter_horizontal = ['contacts',]
     fieldsets = (
         (None,
@@ -50,6 +54,8 @@ class APIUserAdmin(VersionAdmin):
 class EventAdmin(VersionAdmin):
     prepopulated_fields = {'slug': ("name",)}
     list_display = ('name', 'slug', 'description', 'enabled')
+    search_fields = ('name', 'slug', 'description')
+    list_filter = ('enabled',)
     filter_horizontal = ['contacts','groups']
     fieldsets = (
         (None,
@@ -70,7 +76,8 @@ class EventAdmin(VersionAdmin):
 class AuditLogAdmin(admin.ModelAdmin):
     list_display = ('timestamp', 'notification_id', 'gateway_response', 'notification_type', 
                     'notification_slug', 'contact', 'message', 'send_ok', 'delivery_confirmed')
-
+    search_fields = ('notification_id', 'gateway_response', 'message')
+    list_filter = ('send_ok', 'delivery_confirmed', 'notification_type', 'notification_slug')
     fieldsets = (
                  ( None,
                    { 'fields' : (
