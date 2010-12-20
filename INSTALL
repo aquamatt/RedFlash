@@ -3,7 +3,9 @@ Outline installation instructions
 
 Pending more complete documentation the process to install for test and development
 is outlined below. Production installation is left to the enthusiastic reader to
-work out :)
+work out but the init.d script in ext/redflash_init.d can be used as a template which,
+after editing, can be put into /etc/init.d/redflash and used to start the process
+under gunicorn (installed in requirements). 
 
 1) Create a directory in which to build a Python virtual environment and create:
 

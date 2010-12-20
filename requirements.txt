@@ -1,7 +1,8 @@
-django
+django>=1.2
 django-reversion
 django-debug-toolbar
 #MySQL-python
 south>=0.7
 django-extensions
+gunicorn
 
