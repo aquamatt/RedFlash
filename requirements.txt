@@ -1,0 +1,7 @@
+django
+django-reversion
+django-debug-toolbar
+#MySQL-python
+south>=0.7
+django-extensions
+

@@ -1,0 +1,10 @@
+TODO
+====
+* Allow contact to be a Twitter ID instead of a phone number
+
+* Should we have a status code/message for when any attempt to send a message results
+in no recipients getting it on account of all being disabled/erroring?
+
+* Implement delivery confirmation call-back handler
+
+* Allow events to have a custom 'sender number' to be attached...
