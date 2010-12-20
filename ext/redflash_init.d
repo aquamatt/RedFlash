@@ -11,10 +11,11 @@
 
 USER=www-data
 NAME=redflash
+BIND_ADDRESS=127.0.0.1:8000
 PID="/tmp/"$NAME".pid"
 LOGFILE=/var/log/redflash.log
 REDFLASH_ROOT="/srv/redflash"
-GUNICORN_RUN="$REDFLASH_ROOT/bin/gunicorn --log-file=$LOGFILE -D -p $PID -w 4 redflash_wsgi:application"
+GUNICORN_RUN="$REDFLASH_ROOT/bin/gunicorn -b $BIND_ADDRESS --log-file=$LOGFILE -D -p $PID -w 4 redflash_wsgi:application"
 # Confdir: the Django project inside the virtualenv
 CONFDIR="$REDFLASH_ROOT/redflash/config"
 VENV_ACTIVATION=". ../../bin/activate"
