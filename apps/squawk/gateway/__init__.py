@@ -8,19 +8,19 @@ import urllib
 import types
 
 def _log(notification_id, gateway_id, api_user, notification_type, notification_slug, 
-         contact, has_error, message):
+         contact, send_ok, message):
         # really really nasty hack because the gateway class is set in settings,
         # so the import fails as it is called before settings has fully instantiated
         # Better is to have the class in settings as  a String and sort out later
-        from squawk.models import MessageLog
-        ml = MessageLog(notification_id = notification_id,
+        from squawk.models import AuditLog
+        ml = AuditLog(notification_id = notification_id,
                         gateway_id = gateway_id,
                         api_user = api_user,
                         notification_type = notification_type,
                         notification_slug = notification_slug,
                         contact = contact,
                         message = message,
-                        has_error = has_error,
+                        send_ok = send_ok,
                         delivery_confirmed = False
                         )
         ml.save()
@@ -39,13 +39,13 @@ return quietly otherwise. """
         self.LAST_MESSAGE = message
         self.LAST_NOTIFICATION_ID = notification_id
         
-        has_error = True if message == 'FAIL MESSAGE' else False
+        send_ok = False if message == 'FAIL MESSAGE' else True
         
         for contact in contacts:
             _log(notification_id, 'xxx123', api_user, notification_type, 
-                 notification_slug, contact, has_error, message)    
+                 notification_slug, contact, send_ok, message)    
             
-        if has_error:            
+        if not send_ok:            
             raise Exception("Send failed")
 
 class ClickatellGateway(object):
@@ -113,26 +113,26 @@ delivery in log.
                 id = OK_MO.groups()[0]
                 contact = contacts[0]
                 _log(notification_id, id, api_user, notification_type, 
-                     notification_slug, contact, False, message)
+                     notification_slug, contact, True, message)
             
             elif OK_MULTI_MO: ## multiple numbers posting
                 id, number = OK_MULTI_MO.groups()
                 contact = contacts_by_number[number]
                 _log(notification_id, id, api_user, notification_type, 
-                     notification_slug, contact, False, message)
+                     notification_slug, contact, True, message)
 
             elif NOK_MO: ## error single number
                 err = NOK_MO.groups()[0]
                 contact = contacts[0]
                 _log(notification_id, err, api_user, notification_type, 
-                     notification_slug, contact, True, message)
+                     notification_slug, contact, False, message)
                 has_error = err
 
             elif NOK_MULTI_MO: ## error multi number posting
                 err, number = NOK_MULTI_MO.groups()
                 contact = contacts_by_number[number]
                 _log(notification_id, err, api_user, notification_type, 
-                     notification_slug, contact, True, message)
+                     notification_slug, contact, False, message)
                 has_error = err
             else:
                 # @todo log the error

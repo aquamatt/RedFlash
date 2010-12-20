@@ -92,7 +92,7 @@ RECIPIENT_CHOICES = ( ('contact', 'Contact'),
                       ('group', 'Group'),
                       ('event', 'Event'),
                      )
-class MessageLog(models.Model):
+class AuditLog(models.Model):
     """
     Log of all messages sent.
 """
@@ -104,5 +104,5 @@ class MessageLog(models.Model):
     notification_slug = models.CharField(max_length = 100, help_text = "slug of the contact or group")
     contact = models.ForeignKey(Contact)
     message = models.TextField()
-    has_error = models.BooleanField(default = False)
+    send_ok = models.BooleanField(default = False)
     delivery_confirmed = models.BooleanField(default = False)

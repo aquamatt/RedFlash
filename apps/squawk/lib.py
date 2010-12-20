@@ -14,7 +14,7 @@ from squawk import DisabledEventError
 from squawk import PartialSendError
 from squawk.models import Contact
 from squawk.models import ContactGroup
-from squawk.models import MessageLog
+from squawk.models import AuditLog
 from squawk.models import Event
 from django.template import Context
 from django.template import Template

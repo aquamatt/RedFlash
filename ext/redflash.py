@@ -31,7 +31,7 @@ def _notify(rf_url, ctype, slug, api_key, message):
                 data = urllib.urlencode(data))
     code = u.getcode()
     if code == 500:
-        raise Exception("Server error")
+        raise Exception("Server error: %s" % "".join(u.readlines()))
     elif code == 403:
         raise Exception("Invalid key")
     elif code == 404:

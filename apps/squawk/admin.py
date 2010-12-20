@@ -4,7 +4,7 @@ from squawk.models import Contact
 from squawk.models import ContactGroup
 from squawk.models import APIUser
 from squawk.models import Event
-from squawk.models import MessageLog
+from squawk.models import AuditLog
 
 class ContactAdmin(VersionAdmin):
     prepopulated_fields = {'slug': ("name",)}
@@ -67,9 +67,9 @@ class EventAdmin(VersionAdmin):
         )
     )
 
-class MessageLogAdmin(admin.ModelAdmin):
+class AuditLogAdmin(admin.ModelAdmin):
     list_display = ('timestamp', 'notification_id', 'gateway_id', 'notification_type', 
-                    'notification_slug', 'contact', 'message', 'has_error', 'delivery_confirmed')
+                    'notification_slug', 'contact', 'message', 'send_ok', 'delivery_confirmed')
 
     fieldsets = (
                  ( None,
@@ -78,7 +78,7 @@ class MessageLogAdmin(admin.ModelAdmin):
                                  ('api_user', 'contact'),
                                  ('notification_type','notification_slug'),
                                  'message',
-                                 ('has_error','delivery_confirmed')
+                                 ('send_ok','delivery_confirmed')
                                  )
                     }
                   ),
@@ -88,4 +88,4 @@ admin.site.register(Contact, ContactAdmin)
 admin.site.register(ContactGroup, ContactGroupAdmin)
 admin.site.register(APIUser, APIUserAdmin)
 admin.site.register(Event, EventAdmin)
-admin.site.register(MessageLog, MessageLogAdmin)
+admin.site.register(AuditLog, AuditLogAdmin)
