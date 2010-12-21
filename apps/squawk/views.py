@@ -135,9 +135,13 @@ def clickatell_delivery_ack(request):
     """ Handler for delivery status callbacks from clickatell. Expects a POST 
 submission. """
 
-    gateway_id = request.POST.get('apiMsgId')
-    to_number = request.POST.get('to')
-    status = request.POST.get('status')
+    try:
+        gateway_id = request.POST.get('apiMsgId')
+        to_number = request.POST.get('to')
+        status = request.POST.get('status')
+    except KeyError:
+        print str(request.POST)
+        return HttpResponse("OK", status = 200)
     
     status_text = {'001' : 'Message unknown',
                    '002' : 'Message queued',
@@ -161,3 +165,6 @@ submission. """
         al.save()
     except AuditLog.DoesNotExist:
         raise
+
+    return HttpResponse("OK", status = 200)
+    
