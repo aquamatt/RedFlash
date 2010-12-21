@@ -104,6 +104,6 @@ class AuditLog(models.Model):
     notification_slug = models.CharField(max_length = 100, help_text = "slug of the contact or group")
     contact = models.ForeignKey(Contact)
     message = models.TextField()
-    gateway_status = models.CharField(max_length = 200)
+    gateway_status = models.CharField(max_length = 200, default = '')
     send_ok = models.BooleanField(default = False)
     delivery_confirmed = models.BooleanField(default = False)

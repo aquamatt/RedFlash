@@ -23,7 +23,8 @@ def _log(notification_id, gateway_response, api_user, notification_type, notific
                         contact = contact,
                         message = message,
                         send_ok = send_ok,
-                        delivery_confirmed = False
+                        delivery_confirmed = False,
+                        delivery_stauts = ''
                         )
         ml.save()
 
