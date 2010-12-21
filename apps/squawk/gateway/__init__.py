@@ -24,7 +24,7 @@ def _log(notification_id, gateway_response, api_user, notification_type, notific
                         message = message,
                         send_ok = send_ok,
                         delivery_confirmed = False,
-                        delivery_status = ''
+                        gateway_status = ''
                         )
         ml.save()
 
