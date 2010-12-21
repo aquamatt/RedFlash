@@ -23,7 +23,8 @@ def _log(notification_id, gateway_response, api_user, notification_type, notific
                         contact = contact,
                         message = message,
                         send_ok = send_ok,
-                        delivery_confirmed = False
+                        delivery_confirmed = False,
+                        gateway_status = ''
                         )
         ml.save()
 
@@ -73,6 +74,7 @@ delivery in log.
         self.GATEWAY_PASSWORD = settings.GATEWAY_PASSWORD
         self.GATEWAY_API_ID = settings.GATEWAY_API_ID
         self.GATEWAY_URL = settings.GATEWAY_URL
+        self.GATEWAY_ACK = settings.GATEWAY_ENABLE_ACK
         gon = getattr(settings, 'GATEWAY_ORIGIN_NUMBER', None)
         self.GATEWAY_ORIGIN_NUMBER = None
         if gon:
@@ -101,6 +103,9 @@ delivery in log.
                     }
         if self.GATEWAY_ORIGIN_NUMBER:
             post_data['from'] = self.GATEWAY_ORIGIN_NUMBER
+            
+        if self.GATEWAY_ACK:
+            post_data['callback'] = 3
             
         encoded_data = urllib.urlencode(post_data)
         

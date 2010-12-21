@@ -16,6 +16,7 @@ from squawk.lib import fire_event
 from squawk.models import APIUser
 from squawk.models import Contact
 from squawk.models import ContactGroup
+from squawk.models import AuditLog
 
 def contact_request(request, slug=None):
     api_key = request.REQUEST.get('api_key', None)
@@ -129,3 +130,41 @@ def event_request(request, slug):
         response = HttpResponse("Invalid request method", status = 403)
 
     return response
+
+def clickatell_delivery_ack(request):
+    """ Handler for delivery status callbacks from clickatell. Expects a POST 
+submission. """
+
+    try:
+        gateway_id = request.POST.get('apiMsgId')
+        to_number = request.POST.get('to')
+        status = request.POST.get('status')
+    except KeyError:
+        print str(request.POST)
+        return HttpResponse("OK", status = 200)
+    
+    status_text = {'001' : 'Message unknown',
+                   '002' : 'Message queued',
+                   '003' : 'Delivered to gateway',
+                   '004' : 'Received by recipient',  ## END OF STORY :)
+                   '005' : 'Error with message',
+                   '006' : 'User cancelled message delivery',
+                   '007' : 'Error delivering message',
+                   '008' : 'Message received by gateway',
+                   '009' : 'Routing error',
+                   '010' : 'Message expired',
+                   '011' : 'Message queued',
+                   '012' : 'Out of credit',
+                   }.get(status, "STATUS UNKNOWN: %s"%status)
+    
+    try:
+        al = AuditLog.objects.get(gateway_response = gateway_id)
+        al.gateway_status = status_text
+        if status == '004':
+            al.delivery_confirmed = True
+        al.save()
+    except AuditLog.DoesNotExist:
+        raise
+
+    return HttpResponse("OK", status = 200)
+    

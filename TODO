@@ -7,6 +7,8 @@ in no recipients getting it on account of all being disabled/erroring?
 
 * Implement delivery confirmation call-back handler
 
+* move clickatel_delivery_status content into the gateway class
+
 * Allow events to have a custom 'sender number' to be attached...
 
 * Little front-end GUI for sending messages manually
