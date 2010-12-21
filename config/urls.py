@@ -6,6 +6,7 @@ from django.conf.urls.defaults import *
 from squawk.views import contact_request
 from squawk.views import group_request
 from squawk.views import event_request
+from squawk.views import clickatell_delivery_ack 
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -25,4 +26,5 @@ urlpatterns = patterns('',
     (r'contact/(?P<slug>[a-zA-Z0-9_\-]*)/$', contact_request),
     (r'group/(?P<slug>[a-zA-Z0-9_\-]*)/$', group_request),
     (r'event/(?P<slug>[a-zA-Z0-9_\-]*)/$', event_request),
+    (r'ack/$', clickatell_delivery_ack),
 )

@@ -17,6 +17,9 @@ GATEWAY_API_ID = '<YOUR API ID>'
 # With Clickatell, this must be a number registered with them
 # GATEWAY_ORIGIN_NUMBER = "<ORIGIN NUMBER>"
 
+# Enable this if the gateway is making acknowledgement callbacks
+GATEWAY_ENABLE_ACK = False
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
