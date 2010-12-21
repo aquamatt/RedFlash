@@ -5,8 +5,6 @@ TODO
 * Should we have a status code/message for when any attempt to send a message results
 in no recipients getting it on account of all being disabled/erroring?
 
-* Implement delivery confirmation call-back handler
-
 * move clickatel_delivery_status content into the gateway class
 
 * Allow events to have a custom 'sender number' to be attached...
