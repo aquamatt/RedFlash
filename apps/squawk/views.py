@@ -2,6 +2,7 @@
 # All Rights Reserved
 # See LICENSE for details
 
+from datetime import datetime
 from django.http import HttpResponse
 from squawk import InvalidContactError
 from squawk import InvalidGroupError
@@ -138,6 +139,7 @@ submission. """
     gateway_id = request.POST.get('apiMsgId')
     to_number = request.POST.get('to')
     status = request.POST.get('status')
+    timestamp = request.POST.get('timestamp')
     
     status_text = {'001' : 'Message unknown',
                    '002' : 'Message queued',
@@ -158,6 +160,7 @@ submission. """
         al.gateway_status = status_text
         if status == '004':
             al.delivery_confirmed = True
+        al.status_timestamp = datetime.fromtimestamp(int(timestamp))
         al.save()
     except AuditLog.DoesNotExist:
         ## @todo - log this!!
