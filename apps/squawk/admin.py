@@ -78,9 +78,10 @@ class AuditLogAdmin(admin.ModelAdmin):
                     'notification_slug', 'contact', 'message', 'send_ok', 'delivery_confirmed')
     search_fields = ('notification_id', 'gateway_response', 'message')
     list_filter = ('send_ok', 'delivery_confirmed', 'notification_type', 'notification_slug')
+    readonly_fields = ("status_timestamp",)
     fieldsets = (
                  ( None,
-                   { 'fields' : (
+                   { 'fields' : ( 
                                  ('notification_id', 'gateway_response'),
                                  ('api_user', 'contact'),
                                  ('notification_type','notification_slug'),
