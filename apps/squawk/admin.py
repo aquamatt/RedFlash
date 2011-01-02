@@ -86,7 +86,9 @@ class AuditLogAdmin(admin.ModelAdmin):
                                  ('api_user', 'contact'),
                                  ('notification_type','notification_slug'),
                                  'message',
-                                 ('send_ok','delivery_confirmed', 'gateway_status', 'status_timestamp')
+                                 ('send_ok','delivery_confirmed', 
+                                  'gateway_status', 'charge', 
+                                  'status_timestamp')
                                  )
                     }
                   ),
