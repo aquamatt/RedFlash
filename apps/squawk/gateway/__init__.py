@@ -8,6 +8,7 @@
 import re
 import urllib
 import types
+from datetime import datetime
 
 def _log(notification_id, gateway_response, api_user, notification_type, notification_slug, 
          contact, send_ok, message):
@@ -15,6 +16,7 @@ def _log(notification_id, gateway_response, api_user, notification_type, notific
         # so the import fails as it is called before settings has fully instantiated
         # Better is to have the class in settings as  a String and sort out later
         from squawk.models import AuditLog
+        # end nasty hack
         ml = AuditLog(notification_id = notification_id,
                         gateway_response = gateway_response,
                         api_user = api_user,
@@ -24,7 +26,8 @@ def _log(notification_id, gateway_response, api_user, notification_type, notific
                         message = message,
                         send_ok = send_ok,
                         delivery_confirmed = False,
-                        gateway_status = ''
+                        gateway_status = '',
+                        charge = None
                         )
         ml.save()
 
@@ -50,6 +53,9 @@ return quietly otherwise. """
             
         if not send_ok:            
             raise Exception("Send failed")
+
+    def status_callback(self, callback_data):
+        pass
 
 class ClickatellGateway(object):
     """ Gateway class for Clickatell: http://www.clickatell.com 
@@ -149,3 +155,49 @@ delivery in log.
     
             if has_error:
                 raise Exception(has_error)
+                
+    def status_callback(self, callback_data):
+        """ Log status information returned from the Clickatell gateway """
+        # really really nasty hack because the gateway class is set in settings,
+        # so the import fails as it is called before settings has fully instantiated
+        # Better is to have the class in settings as  a String and sort out later
+        from squawk.models import AuditLog
+        # end nasty hack
+        gateway_id = callback_data.get('apiMsgId')
+        to_number = callback_data.get('to')
+        status = callback_data.get('status')
+        timestamp = callback_data.get('timestamp')
+        try:
+            charge = callback_data.get('charge', None)
+            charge = float(charge) if charge else None
+        except ValueError:
+            ## @todo - log this!
+            charge = None
+            
+        
+        status_text = {'001' : 'Message unknown',
+                       '002' : 'Message queued',
+                       '003' : 'Delivered to gateway',
+                       '004' : 'Received by recipient',  ## END OF STORY :)
+                       '005' : 'Error with message',
+                       '006' : 'User cancelled message delivery',
+                       '007' : 'Error delivering message',
+                       '008' : 'Message received by gateway',
+                       '009' : 'Routing error',
+                       '010' : 'Message expired',
+                       '011' : 'Message queued',
+                       '012' : 'Out of credit',
+                       }.get(status, "STATUS UNKNOWN: %s"%status)
+        
+        try:
+            al = AuditLog.objects.get(gateway_response = gateway_id)
+            al.gateway_status = status_text
+            al.charge = charge
+            if status == '004':
+                al.delivery_confirmed = True
+            al.status_timestamp = datetime.fromtimestamp(int(timestamp))
+            al.save()
+        except AuditLog.DoesNotExist:
+            ## @todo - log this!!
+            pass
+        

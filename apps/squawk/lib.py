@@ -90,3 +90,7 @@ and one in the message_[contact|group] methods
     contacts = list(set(contacts))
 
     GATEWAY.send(api_user, notification_id, 'event', event_slug, contacts, message)
+
+def status_callback(callback_data):
+    """ Receive POST with delivery status data from the gateway """
+    GATEWAY.status_callback(callback_data)

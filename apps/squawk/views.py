@@ -2,7 +2,6 @@
 # All Rights Reserved
 # See LICENSE for details
 
-from datetime import datetime
 from django.http import HttpResponse
 from squawk import InvalidContactError
 from squawk import InvalidGroupError
@@ -14,10 +13,10 @@ from squawk import PartialSendError
 from squawk.lib import message_contact
 from squawk.lib import message_group
 from squawk.lib import fire_event
+from squawk.lib import status_callback
 from squawk.models import APIUser
 from squawk.models import Contact
 from squawk.models import ContactGroup
-from squawk.models import AuditLog
 
 def contact_request(request, slug=None):
     api_key = request.REQUEST.get('api_key', None)
@@ -132,39 +131,9 @@ def event_request(request, slug):
 
     return response
 
-def clickatell_delivery_ack(request):
-    """ Handler for delivery status callbacks from clickatell. Expects a POST 
+def delivery_status(request):
+    """ Handler for delivery status callbacks from gateway. Expects a POST 
 submission. """
-
-    gateway_id = request.POST.get('apiMsgId')
-    to_number = request.POST.get('to')
-    status = request.POST.get('status')
-    timestamp = request.POST.get('timestamp')
-    
-    status_text = {'001' : 'Message unknown',
-                   '002' : 'Message queued',
-                   '003' : 'Delivered to gateway',
-                   '004' : 'Received by recipient',  ## END OF STORY :)
-                   '005' : 'Error with message',
-                   '006' : 'User cancelled message delivery',
-                   '007' : 'Error delivering message',
-                   '008' : 'Message received by gateway',
-                   '009' : 'Routing error',
-                   '010' : 'Message expired',
-                   '011' : 'Message queued',
-                   '012' : 'Out of credit',
-                   }.get(status, "STATUS UNKNOWN: %s"%status)
-    
-    try:
-        al = AuditLog.objects.get(gateway_response = gateway_id)
-        al.gateway_status = status_text
-        if status == '004':
-            al.delivery_confirmed = True
-        al.status_timestamp = datetime.fromtimestamp(int(timestamp))
-        al.save()
-    except AuditLog.DoesNotExist:
-        ## @todo - log this!!
-        pass
-
+    status_callback(request.POST)
     return HttpResponse("OK", status = 200)
     

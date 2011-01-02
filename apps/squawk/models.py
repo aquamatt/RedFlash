@@ -108,3 +108,4 @@ class AuditLog(models.Model):
     status_timestamp = models.DateTimeField(blank = True, null = True)
     send_ok = models.BooleanField(default = False)
     delivery_confirmed = models.BooleanField(default = False)
+    charge = models.FloatField(blank = True, null = True)
