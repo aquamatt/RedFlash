@@ -36,6 +36,7 @@ class DummyGateway(object):
     def __init__(self):
         self.LAST_MESSAGE = ""
         self.LAST_NOTIFICATION_ID = ""
+        self.GATEWAY_MID = '1234A'
         
     def send(self, api_user, 
              notification_id, notification_type, notification_slug, 
@@ -48,14 +49,57 @@ return quietly otherwise. """
         send_ok = False if message == 'FAIL MESSAGE' else True
         
         for contact in contacts:
-            _log(notification_id, 'xxx123', api_user, notification_type, 
+            _log(notification_id, self.GATEWAY_MID, api_user, notification_type, 
                  notification_slug, contact, send_ok, message)    
             
         if not send_ok:            
-            raise Exception("Send failed")
+            # @todo move this to head once circular imports fixed
+            import squawk
+            raise squawk.GatewayFailError("Send failed", notification_id = notification_id)
 
     def status_callback(self, callback_data):
-        pass
+        """ demo callback handler that is based on Clickatell. """
+        # really really nasty hack because the gateway class is set in settings,
+        # so the import fails as it is called before settings has fully instantiated
+        # Better is to have the class in settings as  a String and sort out later
+        from squawk.models import AuditLog
+        # end nasty hack
+        gateway_id = callback_data.get('apiMsgId')
+        status = callback_data.get('status')
+        timestamp = callback_data.get('timestamp')
+        try:
+            charge = callback_data.get('charge', None)
+            charge = float(charge) if charge else None
+        except ValueError:
+            ## @todo - log this!
+            charge = None
+            
+        
+        status_text = {'001' : 'Message unknown',
+                       '002' : 'Message queued',
+                       '003' : 'Delivered to gateway',
+                       '004' : 'Received by recipient',  ## END OF STORY :)
+                       '005' : 'Error with message',
+                       '006' : 'User cancelled message delivery',
+                       '007' : 'Error delivering message',
+                       '008' : 'Message received by gateway',
+                       '009' : 'Routing error',
+                       '010' : 'Message expired',
+                       '011' : 'Message queued',
+                       '012' : 'Out of credit',
+                       }.get(status, "STATUS UNKNOWN: %s"%status)
+        
+        try:
+            al = AuditLog.objects.get(gateway_response = gateway_id)
+            al.gateway_status = status_text
+            al.charge = charge
+            if status == '004':
+                al.delivery_confirmed = True
+            al.status_timestamp = datetime.fromtimestamp(float(timestamp))
+            al.save()
+        except AuditLog.DoesNotExist:
+            ## @todo - log this!!
+            pass
 
 class ClickatellGateway(object):
     """ Gateway class for Clickatell: http://www.clickatell.com 
@@ -154,7 +198,10 @@ delivery in log.
                 pass
     
             if has_error:
-                raise Exception(has_error)
+                # @todo move this to head once circular imports fixed
+                import squawk
+                raise squawk.GatewayFailError("Error when sending: %s" % has_error, 
+                                        notification_id = notification_id)
                 
     def status_callback(self, callback_data):
         """ Log status information returned from the Clickatell gateway """
@@ -164,7 +211,6 @@ delivery in log.
         from squawk.models import AuditLog
         # end nasty hack
         gateway_id = callback_data.get('apiMsgId')
-        to_number = callback_data.get('to')
         status = callback_data.get('status')
         timestamp = callback_data.get('timestamp')
         try:
@@ -195,7 +241,7 @@ delivery in log.
             al.charge = charge
             if status == '004':
                 al.delivery_confirmed = True
-            al.status_timestamp = datetime.fromtimestamp(int(timestamp))
+            al.status_timestamp = datetime.fromtimestamp(float(timestamp))
             al.save()
         except AuditLog.DoesNotExist:
             ## @todo - log this!!

@@ -35,9 +35,11 @@ def message_contact(api_user, user_slug, message):
         if contact.enabled:
             GATEWAY.send(api_user, notification_id, 'contact', user_slug, [contact], message)
         else:
-            raise DisabledContactError()
+            raise DisabledContactError(message = "Contact '%s' (%s) is disabled" % (contact.name, user_slug))
     except Contact.DoesNotExist:
-        raise InvalidContactError("%s not found" % user_slug)
+        raise InvalidContactError(message = "%s not found" % user_slug)
+
+    return notification_id
     
 def message_group(api_user, group_slug, message):
     """ Message a group of contacts. 
@@ -50,17 +52,20 @@ def message_group(api_user, group_slug, message):
     try:
         group = ContactGroup.objects.get(slug = group_slug)
         if not group.enabled:
-            raise DisabledGroupError()
+            raise DisabledGroupError(message = "Group %s is disabled" % group.slug)
         contacts = [c for c in group.contacts.all() if c.enabled]
         try:
             GATEWAY.send(api_user, notification_id, 'group', group_slug, contacts, message)
         except Exception, ex:
             SEND_ERROR = ex
     except ContactGroup.DoesNotExist:
-        raise InvalidGroupError("%s not found" % group_slug)
+        raise InvalidGroupError(message = "%s not found" % group_slug)
         
     if SEND_ERROR:
-        raise PartialSendError("Error in sending message: %s" % SEND_ERROR)
+        raise PartialSendError(message = "Error in sending message: %s" % SEND_ERROR,
+                                notification_id = notification_id)
+
+    return notification_id
 
 def fire_event(api_user, event_slug, post_args):
     """ Fire an event and message associated users and groups. 
@@ -72,10 +77,10 @@ and one in the message_[contact|group] methods
     try:
         event = Event.objects.get(slug = event_slug)
     except Event.DoesNotExist:
-        raise InvalidEventError("%s not found" % event_slug)
+        raise InvalidEventError(message = "%s not found" % event_slug)
     
     if not event.enabled:
-        raise DisabledEventError()
+        raise DisabledEventError(message = "Event %s is disabled" % event_slug)
     
     template = Template(event.message)
     context = Context(post_args)
@@ -90,6 +95,8 @@ and one in the message_[contact|group] methods
     contacts = list(set(contacts))
 
     GATEWAY.send(api_user, notification_id, 'event', event_slug, contacts, message)
+
+    return notification_id
 
 def status_callback(callback_data):
     """ Receive POST with delivery status data from the gateway """

@@ -19,6 +19,9 @@ GATEWAY_API_ID = '<YOUR API ID>'
 
 # Enable this if the gateway is making acknowledgement callbacks
 GATEWAY_ENABLE_ACK = False
+# Either POST or GET, determines the method used to send data when
+# the gateway callsback to this application
+GATEWAY_CALLBACK_METHOD = 'POST'
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG

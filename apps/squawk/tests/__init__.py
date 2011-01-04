@@ -4,3 +4,4 @@
 
 from squawk.tests.view_test import *
 from squawk.tests.model_test import *
+from squawk.tests.misc_test import *
