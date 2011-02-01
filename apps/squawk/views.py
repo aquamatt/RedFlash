@@ -2,6 +2,7 @@
 # All Rights Reserved
 # See LICENSE for details
 
+from datetime import datetime
 from django.http import HttpResponse
 from django.conf import settings
 from squawk import InvalidContactError
@@ -18,6 +19,7 @@ from squawk.lib import status_callback
 from squawk.models import APIUser
 from squawk.models import Contact
 from squawk.models import ContactGroup
+from squawk.models import AuditLog
 
 def contact_request(request, slug=None):
     api_key = request.REQUEST.get('api_key', None)
@@ -161,4 +163,3 @@ submission."""
         callback_method = 'POST'
     status_callback(getattr(request, callback_method))
     return HttpResponse("OK", status = 200)
-    

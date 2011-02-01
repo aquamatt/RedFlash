@@ -9,7 +9,7 @@ in no recipients getting it on account of all being disabled/erroring?
 
 * re-factor gateway
 
-* move clickatell_delivery_status content into the gateway class
+* move clickatel_delivery_status content into the gateway class
 
 * Allow events to have a custom 'sender number' to be attached...
 
