@@ -20,15 +20,29 @@ class Contact(models.Model, SerializableModel):
     """
     Model representing a single contact with a telephone number 
 """
-    _SERIALIZED_FIELDS_ = ['name', 'slug', 'number']
+    _SERIALIZED_FIELDS_ = ['name', 'slug']
 
     name = models.CharField(max_length = 100)
     slug = models.SlugField(max_length = 100)
     enabled = models.BooleanField(default = True)
-    number = models.CharField(max_length=20, blank = False)
 
     def __unicode__(self):
         return self.name
+
+PHONE, TWITTER = (0,1)
+CONTACT_TYPES = (
+    (PHONE, "Phone"),
+    (TWITTER, "Twitter"),
+)
+class ContactEndPoint(models.Model):
+    """ The phone number, twitter ID etc. for a contact"""
+    end_point = models.IntegerField(choices=CONTACT_TYPES)    
+    address = models.CharField(max_length = 50)
+    enabled = models.BooleanField(default = False)
+    contact = models.ForeignKey(Contact)
+    
+    def __unicode__(self):
+        return self.address
         
 class ContactGroup(models.Model, SerializableModel):
     """
@@ -92,7 +106,8 @@ RECIPIENT_CHOICES = ( ('contact', 'Contact'),
                       ('group', 'Group'),
                       ('event', 'Event'),
                      )
-class AuditLog(models.Model):
+
+class TransmissionLog(models.Model):
     """
     Log of all messages sent.
 """
@@ -103,9 +118,15 @@ class AuditLog(models.Model):
     notification_type = models.CharField(max_length = 10, choices = RECIPIENT_CHOICES)
     notification_slug = models.CharField(max_length = 100, help_text = "slug of the contact or group")
     contact = models.ForeignKey(Contact)
+    # end point and address copied from ContactEndPoint in order that all
+    # transmission info be in one place and provide an immutable log - the twitter
+    # ID may change in future, for example, but on this occasion it was @<whatever>
+    end_point = models.IntegerField(choices=CONTACT_TYPES)    
+    address = models.CharField(max_length = 50)
     message = models.TextField()
     gateway_status = models.CharField(max_length = 200, default = '')
     status_timestamp = models.DateTimeField(blank = True, null = True)
     send_ok = models.BooleanField(default = False)
+    enqueued = models.BooleanField(default = True)
     delivery_confirmed = models.BooleanField(default = False)
     charge = models.FloatField(blank = True, null = True)

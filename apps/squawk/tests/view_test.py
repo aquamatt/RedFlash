@@ -5,7 +5,7 @@ from datetime import datetime
 from django.test import TestCase
 from django.conf import settings
 from squawk.gateway import DummyGateway
-from squawk.models import AuditLog
+from squawk.models import TransmissionLog
 import squawk.lib
 import simplejson as json
 
@@ -30,7 +30,9 @@ class TestContactHandlers(SquawkTestCase):
         self.valid_key = '12345678901234567890'
         self.valid_admin = '1af89877901234567890'
         self.invalid_key = '11111111111111111111'
-        squawk.lib.GATEWAY = DummyGateway()
+        settings.SMS_GATEWAY = "DummyGateway"
+        # force gateway to re-load
+        squawk.gateway.gateway(break_cache = True) 
 
     def test_get_contact_data(self):
         response = self.client.get('/contact/demo-user/', data = {'api_key' : self.valid_admin})
@@ -108,6 +110,9 @@ class TestContactHandlers(SquawkTestCase):
                                                                    'message':'The message'})
         self.assertStatus(response, 404)
         self.assertIsJSON(response.content)
+
+    def test_post_to_enabled_contact_no_enabled_endpoints(self):
+        self.fail("No test")
     
     def test_post_to_fake_contact_invalid_key(self):
         response = self.client.post('/contact/fake-user/', data = {'api_key':self.invalid_key,
@@ -127,7 +132,9 @@ class TestGroupHandlers(SquawkTestCase):
         self.valid_key = '12345678901234567890'
         self.valid_admin = '1af89877901234567890'
         self.invalid_key = '11111111111111111111'
-        squawk.lib.GATEWAY = DummyGateway()
+        settings.SMS_GATEWAY = "DummyGateway"
+        # force gateway to re-load
+        squawk.gateway.gateway(break_cache = True) 
 
     def test_get_group_data(self):
         response = self.client.get('/group/demo-group/', data = {'api_key' : self.valid_admin})
@@ -233,7 +240,9 @@ class TestEventHandlers(SquawkTestCase):
         self.valid_key = '12345678901234567890'
         self.valid_admin = '1af89877901234567890'
         self.invalid_key = '11111111111111111111'
-        squawk.lib.GATEWAY = DummyGateway()
+        settings.SMS_GATEWAY = "DummyGateway"
+        # force gateway to re-load
+        squawk.gateway.gateway(break_cache = True) 
 
     def test_event_invalid_key(self):
         response = self.client.post('/event/server-overload/', data = {'api_key':self.invalid_key})
@@ -258,7 +267,8 @@ class TestEventHandlers(SquawkTestCase):
     def test_valid_event_send(self):
         response = self.client.post('/event/server-overload/', data = {'api_key':self.valid_key})
         self.assertStatus(response, 201)
-        self.assertEqual(squawk.lib.GATEWAY.LAST_MESSAGE, "Test server overload event : ")
+        squawk.lib.dequeue()
+        self.assertEqual(squawk.gateway.gateway().LAST_MESSAGE, "Test server overload event : ")
         self.assertIsJSON(response.content)
                 
     def test_send_to_disabled_event(self):
@@ -271,7 +281,8 @@ class TestEventHandlers(SquawkTestCase):
                                                                        'x' : 10,
                                                                        'y' : 'hello'})
         self.assertStatus(response, 201)
-        self.assertEqual(squawk.lib.GATEWAY.LAST_MESSAGE, "Test server overload event hello: 10")
+        squawk.lib.dequeue()
+        self.assertEqual(squawk.gateway.gateway().LAST_MESSAGE, "Test server overload event hello: 10")
         self.assertIsJSON(response.content)
 
 class TestDeliveryStatusCallback(SquawkTestCase):
@@ -280,25 +291,29 @@ class TestDeliveryStatusCallback(SquawkTestCase):
 
     def setUp(self):
         self.valid_key = '12345678901234567890'
-        squawk.lib.GATEWAY = DummyGateway()
-        squawk.lib.GATEWAY.GATEWAY_MID = squawk.lib.create_notification_id()
+        settings.SMS_GATEWAY = "DummyGateway"
+        # force gateway to re-load
+        squawk.gateway.gateway(break_cache = True) 
+        squawk.gateway.gateway().GATEWAY_MID = squawk.lib.create_notification_id()
+        settings.GATEWAY_ENABLE_ACK = True
 
         # create the sample sent message which will have the gateway response code set
         # as above
         response = self.client.post('/contact/demo-user/', data = {'api_key':self.valid_key,
                                                                    'message':'The message'})
+        squawk.lib.dequeue()                                                                   
+                                                                   
         self.response_timestamp = datetime(2008, 1, 10, 21, 20)
         
     def test_callback_delivered(self):
         """ This tests the demo callback handler NOT one of the real handlers. """
-        data = { 'apiMsgId' : squawk.lib.GATEWAY.GATEWAY_MID,
+        data = { 'apiMsgId' : squawk.gateway.gateway().GATEWAY_MID,
                  'status' : '004',
                  'charge' : '0.3',
                  'timestamp' : '1200000000'
                 }
         response = self.client.post('/ack/', data = data)
-
-        log_entry = AuditLog.objects.get(gateway_response = squawk.lib.GATEWAY.GATEWAY_MID)
+        log_entry = TransmissionLog.objects.get(gateway_response = squawk.gateway.gateway().GATEWAY_MID)
 
         self.assertEqual(log_entry.charge, 0.3)
         self.assertEqual(log_entry.gateway_status, 'Received by recipient')
@@ -308,14 +323,14 @@ class TestDeliveryStatusCallback(SquawkTestCase):
         
     def test_callback_delivered_to_gateway(self):
         """ This tests the demo callback handler NOT one of the real handlers. """
-        data = { 'apiMsgId' : squawk.lib.GATEWAY.GATEWAY_MID,
+        data = { 'apiMsgId' : squawk.gateway.gateway().GATEWAY_MID,
                  'status' : '003',
                  'charge' : '0.3',
                  'timestamp' : '1200000000'
                 }
         response = self.client.post('/ack/', data = data)
 
-        log_entry = AuditLog.objects.get(gateway_response = squawk.lib.GATEWAY.GATEWAY_MID)
+        log_entry = TransmissionLog.objects.get(gateway_response = squawk.gateway.gateway().GATEWAY_MID)
         self.assertEqual(log_entry.charge, 0.3)
         self.assertEqual(log_entry.gateway_status, 'Delivered to gateway')
         self.assertFalse(log_entry.delivery_confirmed)
@@ -327,35 +342,39 @@ class TestLogging(SquawkTestCase):
     
     def setUp(self):
         self.valid_key = '12345678901234567890'
-        squawk.lib.GATEWAY = DummyGateway()
-        squawk.lib.GATEWAY.GATEWAY_MID = squawk.lib.create_notification_id()
+        settings.SMS_GATEWAY = "DummyGateway"
+        # force gateway to re-load
+        squawk.gateway.gateway(break_cache = True) 
+        squawk.gateway.gateway().GATEWAY_MID = squawk.lib.create_notification_id()
 
     def test_contact_log_entry(self):   
         response = self.client.post('/contact/demo-user/', data = {'api_key':self.valid_key,
                                                                    'message':'The second message'})
+        squawk.lib.dequeue()
         try:
-            log_entry = AuditLog.objects.get(gateway_response = squawk.lib.GATEWAY.GATEWAY_MID)
-            self.assertEqual(log_entry.gateway_response, squawk.lib.GATEWAY.GATEWAY_MID) 
+            log_entry = TransmissionLog.objects.get(gateway_response = squawk.gateway.gateway().GATEWAY_MID)
+            self.assertEqual(log_entry.gateway_response, squawk.gateway.gateway().GATEWAY_MID) 
             self.assertEqual(log_entry.message, 'The second message')
             self.assertTrue(log_entry.send_ok)
             self.assertEqual(log_entry.notification_type, 'contact')
             self.assertEqual(log_entry.notification_slug, 'demo-user')
-        except AuditLog.MultipleObjectsReturned:
+        except TransmissionLog.MultipleObjectsReturned:
             self.fail("More than one log entry found on send to contact")
         
     def test_group_log_entry(self):   
         response = self.client.post('/group/demo-group/', data = {'api_key':self.valid_key,
                                                                    'message':'The second message'}
                                     )
+        squawk.lib.dequeue()
         rval = json.loads(response.content)
         nid = rval['notification_id']
-        log_entries = AuditLog.objects.filter(notification_id = nid)
+        log_entries = TransmissionLog.objects.filter(notification_id = nid)
         self.assertEqual(len(log_entries), 2)
 
         # check log entry for send to each contact in the group is right
         contacts = []
         for log_entry in log_entries:
-            self.assertEqual(log_entry.gateway_response, squawk.lib.GATEWAY.GATEWAY_MID) 
+            self.assertEqual(log_entry.gateway_response, squawk.gateway.gateway().GATEWAY_MID) 
             self.assertEqual(log_entry.message, 'The second message')
             self.assertTrue(log_entry.send_ok)
             self.assertEqual(log_entry.notification_type, 'group')

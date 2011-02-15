@@ -2,24 +2,26 @@ from django.contrib import admin
 from reversion.admin import VersionAdmin
 from squawk.models import Contact
 from squawk.models import ContactGroup
+from squawk.models import ContactEndPoint
 from squawk.models import APIUser
 from squawk.models import Event
-from squawk.models import AuditLog
+from squawk.models import TransmissionLog
+
+class ContactEndPointInline(admin.TabularInline):
+    model = ContactEndPoint
+    extra = 1
 
 class ContactAdmin(VersionAdmin):
     prepopulated_fields = {'slug': ("name",)}
-    list_display = ('name', 'slug', 'number', 'enabled')
-    search_fields = ('name', 'slug', 'number')
+    list_display = ('name', 'slug', 'enabled')
+    search_fields = ('name', 'slug' )
     list_filter = ('enabled',)
+    inlines = [ContactEndPointInline,]
+
     fieldsets = (
         (None,
             {'fields':(
                 ('name', 'slug', 'enabled'),
-            )}
-        ),
-        ('Contact details',
-            {'fields':(
-                'number',
             )}
         ),
     )
@@ -73,7 +75,7 @@ class EventAdmin(VersionAdmin):
         )
     )
 
-class AuditLogAdmin(admin.ModelAdmin):
+class TransmissionLogAdmin(admin.ModelAdmin):
     list_display = ('timestamp', 'notification_id', 'gateway_response', 'notification_type', 
                     'notification_slug', 'contact', 'message', 'send_ok', 'delivery_confirmed')
     search_fields = ('notification_id', 'gateway_response', 'message')
@@ -83,10 +85,10 @@ class AuditLogAdmin(admin.ModelAdmin):
                  ( None,
                    { 'fields' : ( 
                                  ('notification_id', 'gateway_response'),
-                                 ('api_user', 'contact'),
+                                 ('api_user', 'contact', 'end_point', 'address'),
                                  ('notification_type','notification_slug'),
                                  'message',
-                                 ('send_ok','delivery_confirmed', 
+                                 ('enqueued', 'send_ok','delivery_confirmed', 
                                   'gateway_status', 'charge', 
                                   'status_timestamp')
                                  )
@@ -98,4 +100,4 @@ admin.site.register(Contact, ContactAdmin)
 admin.site.register(ContactGroup, ContactGroupAdmin)
 admin.site.register(APIUser, APIUserAdmin)
 admin.site.register(Event, EventAdmin)
-admin.site.register(AuditLog, AuditLogAdmin)
+admin.site.register(TransmissionLog, TransmissionLogAdmin)

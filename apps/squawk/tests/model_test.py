@@ -9,9 +9,8 @@ class TestContact(TestCase):
     def test_serialization(self):
         c = Contact(name='Test Contact', 
                     slug='test-contact',
-                    enabled=True,
-                    number='007')
+                    enabled=True)
         json = c.json()
 
-        comparable = '{"number": "007", "name": "Test Contact", "slug": "test-contact"}'
+        comparable = '{"name": "Test Contact", "slug": "test-contact"}'
         self.assertEquals(json, comparable)

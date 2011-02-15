@@ -155,7 +155,8 @@ def event_request(request, slug):
 
 def delivery_status(request):
     """ Handler for delivery status callbacks from gateway. Expects a POST 
-submission."""
+submission.
+"""
     callback_method = getattr(settings, 'GATEWAY_CALLBACK_METHOD', 'POST')
     if callback_method not in ['GET', 'POST']:
         callback_method = 'POST'

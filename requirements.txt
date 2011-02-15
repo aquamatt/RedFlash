@@ -6,3 +6,4 @@ south>=0.7
 django-extensions
 gunicorn
 simplejson
+twitter

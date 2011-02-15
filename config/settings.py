@@ -6,9 +6,9 @@
 import os
 SITE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
-
+######################### GATEWAY CONFIGS ##############################
 #from squawk.gateway import DummyGateway as GATEWAY
-from squawk.gateway import ClickatellGateway as GATEWAY
+SMS_GATEWAY = "ClickatellGateway"
 GATEWAY_URL = "https://api.clickatell.com/http/sendmsg"
 GATEWAY_USER = '<YOUR USER NAME>'
 GATEWAY_PASSWORD = '<YOUR PASSWORD>'
@@ -22,6 +22,16 @@ GATEWAY_ENABLE_ACK = False
 # Either POST or GET, determines the method used to send data when
 # the gateway callsback to this application
 GATEWAY_CALLBACK_METHOD = 'POST'
+
+# this is auth for the sending account
+TWITTER_TOKEN = '<YOUR TOKEN>'
+TWITTER_KEY = '<YOUR KEY>'
+
+# this is for the application
+TWITTER_CONN_SECRET = '247379561-cFjjWq7rZI4AzjmRXSo2EuazQbBA5RR5r67xnvoN'
+TWITTER_CONN_SECRET_KEY = 'kB8OAsX9Pttvn9nbLbgl45Z837UEbydnv4rHAELGaE'
+
+#########################################################################
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
