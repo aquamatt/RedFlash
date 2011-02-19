@@ -13,3 +13,8 @@ def gateway(break_cache = False):
     if break_cache or (not getattr(gateway, '_cache', None)):
         gateway._cache = eval(settings.SMS_GATEWAY)()
     return gateway._cache
+
+def twitter(break_cache = False):
+    if break_cache or (not getattr(twitter, '_cache', None)):
+        twitter._cache = TwitterGateway()
+    return twitter._cache

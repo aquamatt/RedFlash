@@ -27,7 +27,7 @@ To generate first keys:
 
 """
     def __init__(self):
-        self.twitter = twitter.api(oauth=OAuth(settings.TWITTER_TOKEN, 
+        self.twitter = twitter.api.Twitter(auth=OAuth(settings.TWITTER_TOKEN, 
                                    settings.TWITTER_KEY,
                                    settings.TWITTER_CONN_SECRET,
                                    settings.TWITTER_CONN_SECRET_KEY))
@@ -36,6 +36,13 @@ To generate first keys:
         """ Send each individually """
         for tx in txrecords:
             twitterid = tx.address.lstrip('@')
-            self.twitter.direct_messages.new(user="aquamatt", text=tx.message)
-
+            try:
+                self.twitter.direct_messages.new(user="aquamatt", text=tx.message)
+                tx.enqueued = False
+                tx.send_ok = True
+                tx.gateway_status = "Sent to gateway"
+            except Exception, ex:
+                tx.enqueued = False
+                tx.send_ok = False
+                tx.gateway_status = str(ex)
             

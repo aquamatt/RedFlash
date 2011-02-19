@@ -76,10 +76,10 @@ threadsafe)
                                                 **query_keys)
 
 
-    squawk.gateway.gateway().send(sms_txlist)
-#    TWITTER.send(twitter_txlist)
-    for tx in twitter_txlist:
-        print("TWITTER TO %s" % tx.address)
+    if sms_txlist:
+        squawk.gateway.gateway().send(sms_txlist)
+    if twitter_txlist:
+        squawk.gateway.twitter().send(twitter_txlist)
         
 def message_contact(api_user, user_slug, message):
     """ Message a single contact. 
