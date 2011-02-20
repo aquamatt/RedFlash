@@ -28,9 +28,13 @@ TWITTER_TOKEN = '<YOUR TOKEN>'
 TWITTER_KEY = '<YOUR KEY>'
 
 # this is for the application
-TWITTER_CONN_SECRET = '247379561-cFjjWq7rZI4AzjmRXSo2EuazQbBA5RR5r67xnvoN'
-TWITTER_CONN_SECRET_KEY = 'kB8OAsX9Pttvn9nbLbgl45Z837UEbydnv4rHAELGaE'
+TWITTER_CONN_SECRET = 'uS6hO2sV6tDKIOeVjhnFnQ'
+TWITTER_CONN_SECRET_KEY = 'MEYTOS97VvlHX7K1rwHPEqVpTSqZ71HtvoK4sVuYk'
 
+# Causes de-queue to occur in the request-response cycle which
+# is fine for quick tests but is not suitable for production use.
+# Twitter is far too slow for that.
+SEND_IN_PROCESS = False
 #########################################################################
 
 DEBUG = True

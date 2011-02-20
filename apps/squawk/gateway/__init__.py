@@ -9,10 +9,15 @@ from squawk.gateway.tweet import TwitterGateway
 from django.conf import settings
 
 # singleton SMS Gateway instance
-def gateway(break_cache = False):
+def gateway(break_cache = False, new_gateway = None):
+    if new_gateway:
+        settings.SMS_GATEWAY = new_gateway
+        gateway._cache = None
+
     if break_cache or (not getattr(gateway, '_cache', None)):
         gateway._cache = eval(settings.SMS_GATEWAY)()
     return gateway._cache
+
 
 def twitter(break_cache = False):
     if break_cache or (not getattr(twitter, '_cache', None)):

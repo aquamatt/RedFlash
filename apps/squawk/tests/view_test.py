@@ -30,9 +30,10 @@ class TestContactHandlers(SquawkTestCase):
         self.valid_key = '12345678901234567890'
         self.valid_admin = '1af89877901234567890'
         self.invalid_key = '11111111111111111111'
-        settings.SMS_GATEWAY = "DummyGateway"
-        # force gateway to re-load
-        squawk.gateway.gateway(break_cache = True) 
+        # force gateway to re-load and be the dummy
+        squawk.gateway.gateway(new_gateway = "DummyGateway") 
+        # we'll explicitly dequeue in the tests
+        settings.SEND_IN_PROCESS = False
 
     def test_get_contact_data(self):
         response = self.client.get('/contact/demo-user/', data = {'api_key' : self.valid_admin})
@@ -132,9 +133,10 @@ class TestGroupHandlers(SquawkTestCase):
         self.valid_key = '12345678901234567890'
         self.valid_admin = '1af89877901234567890'
         self.invalid_key = '11111111111111111111'
-        settings.SMS_GATEWAY = "DummyGateway"
         # force gateway to re-load
-        squawk.gateway.gateway(break_cache = True) 
+        squawk.gateway.gateway(new_gateway = "DummyGateway")
+        # we'll explicitly dequeue in the tests
+        settings.SEND_IN_PROCESS = False
 
     def test_get_group_data(self):
         response = self.client.get('/group/demo-group/', data = {'api_key' : self.valid_admin})
@@ -240,9 +242,10 @@ class TestEventHandlers(SquawkTestCase):
         self.valid_key = '12345678901234567890'
         self.valid_admin = '1af89877901234567890'
         self.invalid_key = '11111111111111111111'
-        settings.SMS_GATEWAY = "DummyGateway"
         # force gateway to re-load
-        squawk.gateway.gateway(break_cache = True) 
+        squawk.gateway.gateway(new_gateway = "DummyGateway")
+        # we'll explicitly dequeue in the tests
+        settings.SEND_IN_PROCESS = False
 
     def test_event_invalid_key(self):
         response = self.client.post('/event/server-overload/', data = {'api_key':self.invalid_key})
@@ -291,9 +294,10 @@ class TestDeliveryStatusCallback(SquawkTestCase):
 
     def setUp(self):
         self.valid_key = '12345678901234567890'
-        settings.SMS_GATEWAY = "DummyGateway"
         # force gateway to re-load
-        squawk.gateway.gateway(break_cache = True) 
+        squawk.gateway.gateway(new_gateway = "DummyGateway")
+        # we'll explicitly dequeue in the tests
+        settings.SEND_IN_PROCESS = False
         squawk.gateway.gateway().GATEWAY_MID = squawk.lib.create_notification_id()
         settings.GATEWAY_ENABLE_ACK = True
 
@@ -302,7 +306,6 @@ class TestDeliveryStatusCallback(SquawkTestCase):
         response = self.client.post('/contact/demo-user/', data = {'api_key':self.valid_key,
                                                                    'message':'The message'})
         squawk.lib.dequeue()                                                                   
-                                                                   
         self.response_timestamp = datetime(2008, 1, 10, 21, 20)
         
     def test_callback_delivered(self):
@@ -331,10 +334,72 @@ class TestDeliveryStatusCallback(SquawkTestCase):
         response = self.client.post('/ack/', data = data)
 
         log_entry = TransmissionLog.objects.get(gateway_response = squawk.gateway.gateway().GATEWAY_MID)
+        self.assertStatus(response, 200)
         self.assertEqual(log_entry.charge, 0.3)
         self.assertEqual(log_entry.gateway_status, 'Delivered to gateway')
         self.assertFalse(log_entry.delivery_confirmed)
         self.assertEqual(log_entry.status_timestamp, self.response_timestamp)
+
+        
+class TestClickatellDeliveryStatusCallback(SquawkTestCase):
+    """ Test callback handlers for delivery status in the Clickatell
+handler. """
+    fixtures = ['testdata']
+
+    def setUp(self):
+        self.valid_key = '12345678901234567890'
+        self.GATEWAY_MID = squawk.lib.create_notification_id()
+        self.init_gateway("DummyGateway")
+
+        # create the sample sent message which will have the gateway response code set
+        # as above
+        response = self.client.post('/contact/demo-user/', data = {'api_key':self.valid_key,
+                                                                   'message':'The message'})
+        squawk.lib.dequeue()                                                                   
+        self.response_timestamp = datetime(2008, 1, 10, 21, 20)
+
+    def init_gateway(self, gateway):
+        # force gateway to re-load
+        squawk.gateway.gateway(new_gateway = gateway)
+        # we'll explicitly dequeue in the tests
+        settings.SEND_IN_PROCESS = False
+        squawk.gateway.gateway().GATEWAY_MID = self.GATEWAY_MID
+        settings.GATEWAY_ENABLE_ACK = True
+        
+    def test_callback_delivered(self):
+        # switch to clickatell to test that handler
+        self.init_gateway("ClickatellGateway")
+        data = { 'apiMsgId' : squawk.gateway.gateway().GATEWAY_MID,
+                 'status' : '004',
+                 'charge' : '0.3',
+                 'timestamp' : '1200000000'
+                }
+        response = self.client.post('/ack/', data = data)
+        log_entry = TransmissionLog.objects.get(gateway_response = squawk.gateway.gateway().GATEWAY_MID)
+
+        self.assertStatus(response, 200)
+        self.assertEqual(log_entry.charge, 0.3)
+        self.assertEqual(log_entry.gateway_status, 'Received by recipient')
+        self.assertTrue(log_entry.delivery_confirmed)
+        self.assertEqual(log_entry.status_timestamp, self.response_timestamp)
+
+        
+    def test_callback_delivered_to_gateway(self):
+        self.init_gateway("ClickatellGateway")
+        data = { 'apiMsgId' : squawk.gateway.gateway().GATEWAY_MID,
+                 'status' : '003',
+                 'charge' : '0.3',
+                 'timestamp' : '1200000000'
+                }
+        response = self.client.post('/ack/', data = data)
+
+        log_entry = TransmissionLog.objects.get(gateway_response = squawk.gateway.gateway().GATEWAY_MID)
+        self.assertStatus(response, 200)
+        self.assertEqual(log_entry.charge, 0.3)
+        self.assertEqual(log_entry.gateway_status, 'Delivered to gateway')
+        self.assertFalse(log_entry.delivery_confirmed)
+        self.assertEqual(log_entry.status_timestamp, self.response_timestamp)
+
         
 class TestLogging(SquawkTestCase):
     """ Basic test that log entries can be made via dummy gateway. """
@@ -342,9 +407,10 @@ class TestLogging(SquawkTestCase):
     
     def setUp(self):
         self.valid_key = '12345678901234567890'
-        settings.SMS_GATEWAY = "DummyGateway"
         # force gateway to re-load
-        squawk.gateway.gateway(break_cache = True) 
+        squawk.gateway.gateway(new_gateway = "DummyGateway")
+        # we'll explicitly dequeue in the tests
+        settings.SEND_IN_PROCESS = False
         squawk.gateway.gateway().GATEWAY_MID = squawk.lib.create_notification_id()
 
     def test_contact_log_entry(self):   

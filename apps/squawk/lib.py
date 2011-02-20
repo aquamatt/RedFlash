@@ -50,7 +50,9 @@ def enqueue(api_user, notification_id, notification_type, notification_slug,
                         charge = None
                         )
             tl.save()
-            
+    
+    if settings.SEND_IN_PROCESS:
+        dequeue(notification_id) 
 
 def dequeue(notification_id=None):
     """ Pull queued messages out and send them 

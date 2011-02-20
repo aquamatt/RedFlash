@@ -148,7 +148,7 @@ delivery in log.
             tl.gateway_status = status_text
             tl.charge = charge
             if status == '004':
-                al.delivery_confirmed = True
+                tl.delivery_confirmed = True
             tl.status_timestamp = datetime.fromtimestamp(float(timestamp))
             tl.save()
         except TransmissionLog.DoesNotExist:
