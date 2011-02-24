@@ -14,7 +14,7 @@ class TwitterGateway(object):
 2) Using Python Twitter Tools
 
 import twitter.api
-twitter = twitter.api.Twitter(auth=OAuth("15401671-rjM8kX5GjO9qI6bAOBDi5xO2ehlB3B4CdMwqH28j8","twlMosBlg2nZgYdl2hIWEa9Mdt9Wy030u8ooH3C3g","uS6hO2sV6tDKIOeVjhnFnQ","MEYTOS97VvlHX7K1rwHPEqVpTSqZ71HtvoK4sVuYk"))
+twitter = twitter.api.Twitter(auth=OAuth("xxx","yyy","uS6hO2sV6tDKIOeVjhnFnQ","MEYTOS97VvlHX7K1rwHPEqVpTSqZ71HtvoK4sVuYk"))
 twitter.direct_messages.new(user="aquamatt", text="foobar")
 
 First two OAuth keys are generated easily with command line tool. Last two are application ones - think we can stick with those that come with twitter tools though.
@@ -37,7 +37,7 @@ To generate first keys:
         for tx in txrecords:
             twitterid = tx.address.lstrip('@')
             try:
-                rv = self.twitter.direct_messages.new(user="aquamatt", text=tx.message)
+                rv = self.twitter.direct_messages.new(user=tx.address, text=tx.message)
                 tx.gateway_response = "%d" % rv['id']
                 tx.enqueued = False
                 tx.send_ok = True
