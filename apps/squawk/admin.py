@@ -76,9 +76,9 @@ class EventAdmin(VersionAdmin):
     )
 
 class TransmissionLogAdmin(admin.ModelAdmin):
-    list_display = ('timestamp', 'notification_id', 'gateway_response', 'notification_type', 
-                    'notification_slug', 'contact', 'message', 'send_ok', 'delivery_confirmed')
-    search_fields = ('notification_id', 'gateway_response', 'message')
+    list_display = ('timestamp', 'notification_id', 'notification', 'target',
+                    'contact', 'message', 'send_ok', 'delivery_confirmed')
+    search_fields = ('notification_id', 'contact__name', 'gateway_response', 'message', 'address')
     list_filter = ('send_ok', 'delivery_confirmed', 'notification_type', 'notification_slug')
     readonly_fields = ("status_timestamp",)
     fieldsets = (

@@ -34,6 +34,8 @@ CONTACT_TYPES = (
     (PHONE, "Phone"),
     (TWITTER, "Twitter"),
 )
+CONTACT_TYPE_DICT = dict(CONTACT_TYPES)
+
 class ContactEndPoint(models.Model):
     """ The phone number, twitter ID etc. for a contact"""
     end_point = models.IntegerField(choices=CONTACT_TYPES)    
@@ -130,3 +132,13 @@ class TransmissionLog(models.Model):
     enqueued = models.BooleanField(default = True)
     delivery_confirmed = models.BooleanField(default = False)
     charge = models.FloatField(blank = True, null = True)
+
+
+    def _notification(self):
+        return "%s/%s" % (self.notification_type, self.notification_slug)
+    notification = property(_notification)
+
+    def _qualified_endpoint(self):
+        return "%s/%s" % (CONTACT_TYPE_DICT[self.end_point], self.address)
+    target = property(_qualified_endpoint)
+    
