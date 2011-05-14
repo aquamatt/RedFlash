@@ -125,10 +125,12 @@ Status codes:
 Firing event
 ------------
 POST content:
+
 - api_key
 - n arbitrary keys to be included in message template context
 
 URI:
+
 - /event/<slug>
 
 Status codes:
