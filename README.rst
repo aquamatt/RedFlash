@@ -72,7 +72,7 @@ Usage
 More documentation is to come here, and there are basic installation notes in the ``INSTALL`` file. 
 For now you'll have to read the settings.py to find help with getting this running -
 it's not difficult however. Once you have a Clickatell account you're much of the way there. Twitter is also fairly straight
-forward::
+forward:
 
 - create a twitter account to be the sender of alerts
 - use twitter tools described in ``tweet.py`` to generate the appropriate OAuth keys and place in ``/etc/redflash.py``
@@ -105,18 +105,22 @@ URL API structure
 Sending a message
 -----------------
 POST content:
+
 - api_key
 - message
 
 URI:
+
 - /contact/<slug>
 - /group/<slug>
 
-Status 403 if API key forbidden/invalid
-Status 404 if user/group not known or disabled
-Status 201 if message sent
-Status 202 if message sent to some but not all contacts in a group
-Status 500 if message could not be sent due to error or empty message
+Status codes:
+
+- Status 403 if API key forbidden/invalid
+- Status 404 if user/group not known or disabled
+- Status 201 if message sent
+- Status 202 if message sent to some but not all contacts in a group
+- Status 500 if message could not be sent due to error or empty message
 
 Firing event
 ------------
@@ -127,22 +131,26 @@ POST content:
 URI:
 - /event/<slug>
 
-Status 403 if API key forbidden/invalid
-Status 404 if event not known or disabled
-Status 201 if event fired
-Status 500 if message could not be sent due to error or empty message
+Status codes:
+
+- Status 403 if API key forbidden/invalid
+- Status 404 if event not known or disabled
+- Status 201 if event fired
+- Status 500 if message could not be sent due to error or empty message
 
 Getting contact/group info
 --------------------------
 
-GET request to URI as above
-API Key passed as get arg
-Key must be enabled for getting data for contacts
+- GET request to URI as above
+- API Key passed as get arg
+- Key must be enabled for getting data for contacts
 
-Status 500 if exception raised
-Status 404 if user/group not  known or disabled
-Status 403 if API key forbidden/invalid
-Status 200 if OK
+Status codes:
+
+- Status 500 if exception raised
+- Status 404 if user/group not  known or disabled
+- Status 403 if API key forbidden/invalid
+- Status 200 if OK
 
 PUT/DELETE requests:
 
