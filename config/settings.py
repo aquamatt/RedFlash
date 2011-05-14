@@ -34,6 +34,9 @@ TWITTER_CONN_SECRET_KEY = 'MEYTOS97VvlHX7K1rwHPEqVpTSqZ71HtvoK4sVuYk'
 # Causes de-queue to occur in the request-response cycle which
 # is fine for quick tests but is not suitable for production use.
 # Twitter is far too slow for that.
+#
+# NB: suppert for asynchronous sending has yet to be written. Likely
+# cellery or basic use of Redis for this will be implemented.
 SEND_IN_PROCESS = False
 #########################################################################
 
