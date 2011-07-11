@@ -3,24 +3,25 @@
 # See LICENSE for details
 """ Utilities for managing the sending of messages via SMS and other channels
 """
-import uuid
 import squawk.gateway
 import squawk.models
+import uuid
+from celery.task import task
+from django.template import Context
+from django.template import Template
 from django.conf import settings
-from squawk import InvalidContactError
-from squawk import InvalidGroupError
-from squawk import InvalidEventError
 from squawk import DisabledContactError
 from squawk import DisabledGroupError
 from squawk import DisabledEventError
+from squawk import InvalidContactError
+from squawk import InvalidGroupError
+from squawk import InvalidEventError
 from squawk import PartialSendError
 from squawk.models import Contact
 from squawk.models import ContactGroup
 from squawk.models import ContactEndPoint
 from squawk.models import Event
 from squawk.models import TransmissionLog
-from django.template import Context
-from django.template import Template
 
 def create_notification_id():
     return str(uuid.uuid4()).replace('-','')        
@@ -51,8 +52,7 @@ def enqueue(api_user, notification_id, notification_type, notification_slug,
                         )
             tl.save()
     
-    if settings.SEND_IN_PROCESS:
-        dequeue(notification_id) 
+    dequeue(notification_id) 
 
 def dequeue(notification_id=None):
     """ Pull queued messages out and send them 
@@ -71,18 +71,42 @@ threadsafe)
 
     # Do each endpoint in turn as the gateway may batch them out, e.g. SMS can do
     # this
-    sms_txlist = TransmissionLog.objects.filter(end_point = squawk.models.PHONE,
-                                                **query_keys)
+    sms_txlist = [t.id for t in 
+            TransmissionLog.objects.filter(
+            end_point = squawk.models.PHONE, **query_keys
+            )]
 
-    twitter_txlist = TransmissionLog.objects.filter(end_point = squawk.models.TWITTER,
-                                                **query_keys)
+    twitter_txlist = [t.id for t in 
+            TransmissionLog.objects.filter(
+            end_point = squawk.models.TWITTER, **query_keys
+            )] 
 
-
+    if settings.SEND_IN_PROCESS:
+        mthd = transmit
+    else:
+        mthd = transmit.delay
+    
     if sms_txlist:
-        squawk.gateway.gateway().send(sms_txlist)
+        mthd(sms_txlist, "SMS")
+
     if twitter_txlist:
-        squawk.gateway.twitter().send(twitter_txlist)
-        
+        for _id in twitter_txlist:
+            mthd([_id,], "TWEET")
+
+@task
+def transmit(txids, method="SMS"):
+    """ Destined to be run on a celery queue, txids is a list
+of TransmissionLog IDs for the entries to be SMSed. or TWEETed 
+
+method can take values SMS or TWEET
+"""
+    if method == "SMS":
+        squawk.gateway.gateway().send(txids)
+    elif method == "TWEET":
+        squawk.gateway.twitter().send(txids)
+    else:
+        raise Exception("Unknown transmit method: %s" % method)
+
 def message_contact(api_user, user_slug, message):
     """ Message a single contact. 
 @todo some handling if GATEWAY is None or invalid

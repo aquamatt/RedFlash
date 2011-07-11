@@ -33,7 +33,7 @@ class TestContactHandlers(SquawkTestCase):
         # force gateway to re-load and be the dummy
         squawk.gateway.gateway(new_gateway = "DummyGateway") 
         # we'll explicitly dequeue in the tests
-        settings.SEND_IN_PROCESS = False
+        settings.SEND_IN_PROCESS = True
 
     def test_get_contact_data(self):
         response = self.client.get('/contact/demo-user/', data = {'api_key' : self.valid_admin})
@@ -136,7 +136,7 @@ class TestGroupHandlers(SquawkTestCase):
         # force gateway to re-load
         squawk.gateway.gateway(new_gateway = "DummyGateway")
         # we'll explicitly dequeue in the tests
-        settings.SEND_IN_PROCESS = False
+        settings.SEND_IN_PROCESS = True
 
     def test_get_group_data(self):
         response = self.client.get('/group/demo-group/', data = {'api_key' : self.valid_admin})
@@ -245,7 +245,7 @@ class TestEventHandlers(SquawkTestCase):
         # force gateway to re-load
         squawk.gateway.gateway(new_gateway = "DummyGateway")
         # we'll explicitly dequeue in the tests
-        settings.SEND_IN_PROCESS = False
+        settings.SEND_IN_PROCESS = True
 
     def test_event_invalid_key(self):
         response = self.client.post('/event/server-overload/', data = {'api_key':self.invalid_key})
@@ -297,7 +297,7 @@ class TestDeliveryStatusCallback(SquawkTestCase):
         # force gateway to re-load
         squawk.gateway.gateway(new_gateway = "DummyGateway")
         # we'll explicitly dequeue in the tests
-        settings.SEND_IN_PROCESS = False
+        settings.SEND_IN_PROCESS = True
         squawk.gateway.gateway().GATEWAY_MID = squawk.lib.create_notification_id()
         settings.GATEWAY_ENABLE_ACK = True
 
@@ -362,7 +362,7 @@ handler. """
         # force gateway to re-load
         squawk.gateway.gateway(new_gateway = gateway)
         # we'll explicitly dequeue in the tests
-        settings.SEND_IN_PROCESS = False
+        settings.SEND_IN_PROCESS = True
         squawk.gateway.gateway().GATEWAY_MID = self.GATEWAY_MID
         settings.GATEWAY_ENABLE_ACK = True
         
@@ -410,7 +410,7 @@ class TestLogging(SquawkTestCase):
         # force gateway to re-load
         squawk.gateway.gateway(new_gateway = "DummyGateway")
         # we'll explicitly dequeue in the tests
-        settings.SEND_IN_PROCESS = False
+        settings.SEND_IN_PROCESS = True
         squawk.gateway.gateway().GATEWAY_MID = squawk.lib.create_notification_id()
 
     def test_contact_log_entry(self):   

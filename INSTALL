@@ -15,7 +15,8 @@ under gunicorn (installed in requirements).
  
 2) Clone redflash into this directory
 
-3) Install requirements with pip
+3) Install requirements with pip (note that your DBM of choice and Redis or RabbitMQ 
+should be installed in advance)
 
  $ source bin/activate
  $ cd redflash
@@ -28,6 +29,7 @@ under gunicorn (installed in requirements).
 5) Create the redflash database in your chosen database engine and initialise:
 
  $ python manage.py syncdb
+ $ python manage.py migrate
  
 6) Run the server:
 

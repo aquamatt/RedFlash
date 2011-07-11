@@ -34,6 +34,8 @@ To generate first keys:
 
     def send(self, txrecords):
         """ Send each individually """
+        # txrecords is a list of TransmissionLog IDs
+        txrecords = TransmissionLog.objects.filter(pk__in=txrecords)
         for tx in txrecords:
             twitterid = tx.address.lstrip('@')
             try:

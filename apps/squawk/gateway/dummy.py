@@ -16,6 +16,8 @@ class DummyGateway(object):
         """ Dummy gateway will raise Exception if message is "FAIL MESSAGE" or
 return quietly otherwise. 
 """
+        # txrecords is a list of TransmissionLog IDs
+        txrecords = TransmissionLog.objects.filter(pk__in=txrecords)
         message = txrecords[0].message
         notification_id = txrecords[0].notification_id
         self.LAST_MESSAGE = message

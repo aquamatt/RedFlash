@@ -36,6 +36,8 @@ delivery in log.
     def send(self, txrecords):
         # extract numbers and index contacts by number as this will be needed
         # when processing response
+        # txrecords is a list of TransmissionLog IDs
+        txrecords = TransmissionLog.objects.filter(pk__in=txrecords)
         tx_by_number = {}
         message = txrecords[0].message
         notification_id = txrecords[0].notification_id

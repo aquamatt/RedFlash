@@ -59,7 +59,6 @@ Todo
 
 - Much better documentation 
 - Logging - I was lazy, lazy, lazy. There is no excuse, especially as with Django 1.3 we can now just throw logging config into ``settings.py``
-- Implement asynchronous sending of notification - in particular for Twitter
 - Should we have a status code/message for when any attempt to send a message results in no recipients getting it on account of all being disabled/erroring? 
 - Re-factor the gateway
 - move clickatel_delivery_status content into the gateway class
@@ -78,7 +77,7 @@ forward:
 - use twitter tools described in ``tweet.py`` to generate the appropriate OAuth keys and place in ``/etc/redflash.py``
 - ensure that anyone wishing to receive twitter alerts follows the sending account
 
-Twitter can be configured to SMS and DMs and thus used as a cheap and cheerful SMS gateway. Be warned that there can 
+Twitter can be configured to SMS any direct messages and thus can be used as a cheap and cheerful SMS gateway. Be warned that there can 
 be a considerable delay between the sending of a tweet and the sending of the associated SMS (many, many minutes) so 
 this should not be used as a production solution for SMS.
 
@@ -97,6 +96,14 @@ also in the repo. ``pip install`` it and then::
     # template
     rfc.fire_event(<event_slug>, **args)
 
+Synchronous vs Asynchronous sending
+===================================
+
+Sending a tweet is a slow process, and even sending an SMS might be slow. The Redflash client doesn't need to hang around waiting for this to happen so we use Celery to distribute the work of transmitting messages and ensure we can return immediately to the client.
+
+You can force synchronous behaviour be setting ``SEND_IN_PROCESS`` True in ``settings.py``. Leave False for best behaviour, though this does require Redis or RabbitMQ to be running. You also need to start at least one celery daemon::
+
+    python manage.py celeryd -E -linfo
 
 URL API structure
 =================
