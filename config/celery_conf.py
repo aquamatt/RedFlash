@@ -24,12 +24,12 @@ else:
     CELERY_RESULT_BACKEND = "amqp"
 
 CELERY_QUEUES = {
-    "default" : {
+    "redflash" : {
                 "exchange" : "redflash",
                 "binding_key" : "redflash",
                 }
 }
-CELERY_DEFAULT_QUEUE = "default"
+CELERY_DEFAULT_QUEUE = "redflash"
 
 # set True if you don't want to consume results
 CELERY_IGNORE_RESULT = True
