@@ -144,7 +144,7 @@ from celery_conf import *
 try:
     import sys
     sys.path.insert(0, '/etc')
-    from redflash import *
+    from redflash_conf import *
 except ImportError:
     pass
 

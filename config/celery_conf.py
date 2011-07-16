@@ -23,6 +23,14 @@ else:
     BROKER_VHOST = "celery_vhost"
     CELERY_RESULT_BACKEND = "amqp"
 
+CELERY_QUEUES = {
+    "default" : {
+                "exchange" : "redflash",
+                "binding_key" : "redflash",
+                }
+}
+CELERY_DEFAULT_QUEUE = "default"
+
 # set True if you don't want to consume results
 CELERY_IGNORE_RESULT = True
 CELERY_DISABLE_RATE_LIMITS = True
