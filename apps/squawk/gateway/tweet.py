@@ -47,6 +47,6 @@ To generate first keys:
             except Exception, ex:
                 tx.enqueued = False
                 tx.send_ok = False
-                tx.gateway_status = str(ex)
+                tx.gateway_status = str(ex)[:400]
             tx.save()
             
