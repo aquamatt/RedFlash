@@ -84,8 +84,8 @@ this should not be used as a production solution for SMS.
 Clients simply call on the RESTful(ish) API sketched out below. If you have Clickatel sending confirmation receipts, it should
 be configured to call the ``/ack`` URL. 
 
-An example Python client library is included in the ``ext`` directory. It is packaged with distutils and the latest tarball is 
-also in the repo. ``pip install`` it and then::
+An example Python client library can be installed from git://github.com/aquamatt/rfclient.git.
+It is packaged with distutils. ``pip install`` it and then::
 
     from rfclient.redflash import RedFlashClient
     rfc = RedFlashClient(rf_url="http://my.redflash.url", api_key="<key obtained from admin>")

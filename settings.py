@@ -4,6 +4,8 @@
 
 # Django settings for RedFlash project.
 import os
+import sys
+
 SITE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 ######################### GATEWAY CONFIGS ##############################
@@ -114,7 +116,7 @@ MIDDLEWARE_CLASSES = (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
-ROOT_URLCONF = 'config.urls'
+ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
@@ -140,12 +142,18 @@ INSTALLED_APPS = (
 
 from celery_conf import *
 
-# Allow overrides in a /etc/redflash.py config file
-try:
-    import sys
-    sys.path.insert(0, '/etc')
+# host overrides
+if os.path.exists("/etc/redflash/redflash_conf.py") \
+        or os.path.exists("/etc/redflash/redflash_conf"):
+    sys.path.insert(0, "/etc/redflash")
     from redflash_conf import *
+
+# backwards compatibility: previous versions put redflash_conf.py in /etc
+if os.path.exists("/etc/redflash_conf.py"):
+    sys.path.insert(0, "/etc")
+    from redflash_conf import *
+
+try:
+    from local import *
 except ImportError:
     pass
-
-    

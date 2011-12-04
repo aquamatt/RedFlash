@@ -22,7 +22,7 @@ should be installed in advance)
  $ cd redflash
  $ pip install -E .. -r requirements.txt
  
-4) Edit database and SMS gateway details in config/settings.py. For test purposes
+4) Edit database and SMS gateway details in local.py (copy basis for this from settings.py). For test purposes
    comment out the ClickatellGateway and uncomment the DummyGateway (this is forced
    automatically when the test suite is run)
 
@@ -45,17 +45,16 @@ should be installed in advance)
 Local configuration
 ===================
 
-The file /etc/redflash.py is imported by settings.py at the end so can be used
+The file /etc/redflash/redflash_conf.py and local.py are imported by settings.py at the end so can be used
 to override any settings on a per-host basis. You can, for example, put your
 Clickatell user and password in there.
    
 Testing with the Python client
 ==============================
 
-In the ext directory you will find redflash.py which contains a Python client wrapper. Put
-on your Python path and use as follows:
+Install the Redflash client from git://github.com/aquamatt/rfclient.git and use as follows::
 
- from redflash import RedFlashClient
+ from rfclient.redflash import RedFlashClient
  
  rfc = RedFlashClient(rf_url = 'http://REDFLASH.SERVER.ADDRESS', api_key = 'A KEY FROM THE APIUser MODEL')
  rfc.notify_contact('contact-slug', 'message')

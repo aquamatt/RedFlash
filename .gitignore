@@ -1,5 +1,6 @@
 *.pyc
 .pydevproject
 .project
-config/*.json
+**.json
 .*.swp
+local.py
