@@ -39,7 +39,7 @@ To generate first keys:
         for tx in txrecords:
             twitterid = tx.address.lstrip('@')
             try:
-                rv = self.twitter.direct_messages.new(user=tx.address, text=tx.message)
+                rv = self.twitter.direct_messages.new(user=twitterid, text=tx.message)
                 tx.gateway_response = "%d" % rv['id']
                 tx.enqueued = False
                 tx.send_ok = True
