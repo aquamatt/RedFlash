@@ -33,7 +33,7 @@ RedFlash de-couples raising an alert from sending. It provides for defining:
 - groups (of contacts)
 - events
 
-A contact is typically a person and, currently, they can have phone numbers and twitter handles
+A contact is typically a person and, currently, they can have phone numbers, email addresses and twitter handles
 associated with them. By logging into the admin you can selectively, at any time, choose to 
 enable or disable any of these notification channels on a per-contact basis.
 
