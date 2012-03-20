@@ -4,6 +4,7 @@
 """ Twitter gateway implementation
 """
 import twitter.api
+import squawk
 from django.conf import settings
 from squawk.models import TransmissionLog
 from twitter.oauth import OAuth
@@ -36,6 +37,7 @@ To generate first keys:
         """ Send each individually """
         # txrecords is a list of TransmissionLog IDs
         txrecords = TransmissionLog.objects.filter(pk__in=txrecords)
+        errors = []
         for tx in txrecords:
             twitterid = tx.address.lstrip('@')
             try:
@@ -44,9 +46,16 @@ To generate first keys:
                 tx.enqueued = False
                 tx.send_ok = True
                 tx.gateway_status = "Sent to gateway"
+                tx.save()
             except Exception, ex:
                 tx.enqueued = False
                 tx.send_ok = False
                 tx.gateway_status = str(ex)[:400]
-            tx.save()
+                tx.save()
+                errors.append(tx)
+
+        if errors:
+            notification_id = errors[0].notification_id
+            raise squawk.GatewayFailError("Error when sending tweets for notification %s (%s)" % notification_id,
+                                    notification_id = notification_id)
             

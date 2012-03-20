@@ -1,16 +1,10 @@
 {% extends "admin/base.html" %}
 {% load i18n %}
- 
-{% block title %}{% trans 'RedFlash' %}: {{ title }}{% endblock %}
- 
+
+{% block title %}{{ title }} | {% trans 'RedFlash site admin' %}{% endblock %}
+
 {% block branding %}
-<style type="text/css">
-  #header
-  {
-    /* your style here */
-  }
-</style>
-<h1 id="site-name">{% trans 'RedFlash Administration' %}</h1>
+<h1 id="site-name">{% trans 'RedFlash site administration' %}</h1>
 {% endblock %}
- 
+
 {% block nav-global %}{% endblock %}

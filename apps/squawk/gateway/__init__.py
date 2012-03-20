@@ -6,6 +6,7 @@
 from squawk.gateway.dummy import DummyGateway
 from squawk.gateway.clickatell import ClickatellGateway
 from squawk.gateway.tweet import TwitterGateway
+from squawk.gateway.email import EmailGateway
 from django.conf import settings
 
 # singleton SMS Gateway instance
@@ -23,3 +24,8 @@ def twitter(break_cache = False):
     if break_cache or (not getattr(twitter, '_cache', None)):
         twitter._cache = TwitterGateway()
     return twitter._cache
+
+def email(break_cache = False):
+    if break_cache or (not getattr(email, '_cache', None)):
+        email._cache = EmailGateway()
+    return email._cache

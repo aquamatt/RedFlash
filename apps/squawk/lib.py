@@ -19,7 +19,6 @@ from squawk import InvalidEventError
 from squawk import PartialSendError
 from squawk.models import Contact
 from squawk.models import ContactGroup
-from squawk.models import ContactEndPoint
 from squawk.models import Event
 from squawk.models import TransmissionLog
 
@@ -81,6 +80,11 @@ threadsafe)
             end_point = squawk.models.TWITTER, **query_keys
             )] 
 
+    email_txlist = [t.id for t in 
+            TransmissionLog.objects.filter(
+            end_point = squawk.models.EMAIL, **query_keys
+            )] 
+
     if settings.SEND_IN_PROCESS:
         mthd = transmit
     else:
@@ -93,6 +97,10 @@ threadsafe)
         for _id in twitter_txlist:
             mthd([_id,], "TWEET")
 
+    if email_txlist:
+        mthd(email_txlist, "EMAIL")
+
+
 @task
 def transmit(txids, method="SMS"):
     """ Destined to be run on a celery queue, txids is a list
@@ -104,6 +112,8 @@ method can take values SMS or TWEET
         squawk.gateway.gateway().send(txids)
     elif method == "TWEET":
         squawk.gateway.twitter().send(txids)
+    elif method == "EMAIL":
+        squawk.gateway.email().send(txids)
     else:
         raise Exception("Unknown transmit method: %s" % method)
 
