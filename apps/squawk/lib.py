@@ -6,7 +6,7 @@
 import squawk.gateway
 import squawk.models
 import uuid
-from celery.task import task
+from collections import defaultdict
 from django.template import Context
 from django.template import Template
 from django.conf import settings
@@ -21,6 +21,7 @@ from squawk.models import Contact
 from squawk.models import ContactGroup
 from squawk.models import Event
 from squawk.models import TransmissionLog
+from squawk.tasks import transmit
 
 def create_notification_id():
     return str(uuid.uuid4()).replace('-','')        
@@ -28,6 +29,8 @@ def create_notification_id():
 def enqueue(api_user, notification_id, notification_type, notification_slug, 
             contacts, message):
     """ Enqueue message(s) to a single contact endpoint """
+    # group transmission logs according to endpoint
+    endpoint_groups = defaultdict(list)
     for contact in contacts:
         if not contact.enabled:
             continue
@@ -50,72 +53,32 @@ def enqueue(api_user, notification_id, notification_type, notification_slug,
                         charge = None
                         )
             tl.save()
+            endpoint_groups[ep.end_point].append(tl)
+
+    # dispatch to gateways for each type of message
     
-    dequeue(notification_id) 
-
-def dequeue(notification_id=None):
-    """ Pull queued messages out and send them 
-Normal use is to provide the notification_id (this is internal, RedFlash ID) but
-for unit-tests you want to be able to say 'de-queue all' just in case code
-architecture changes to dequeue out of process. To achieve this, set
-notification_id to None. This mode should NOT be used unless testing as it
-will result in messages going to the wrong people on a busy system (ie not
-threadsafe)
-"""
-
-    query_keys = dict(enqueued = True)
-    if notification_id:
-        query_keys['notification_id'] = notification_id
-
-
-    # Do each endpoint in turn as the gateway may batch them out, e.g. SMS can do
-    # this
-    sms_txlist = [t.id for t in 
-            TransmissionLog.objects.filter(
-            end_point = squawk.models.PHONE, **query_keys
-            )]
-
-    twitter_txlist = [t.id for t in 
-            TransmissionLog.objects.filter(
-            end_point = squawk.models.TWITTER, **query_keys
-            )] 
-
-    email_txlist = [t.id for t in 
-            TransmissionLog.objects.filter(
-            end_point = squawk.models.EMAIL, **query_keys
-            )] 
-
     if settings.SEND_IN_PROCESS:
         mthd = transmit
     else:
         mthd = transmit.delay
+
+    # boolean refers to whether the endpoint batches output (True)- ie email has all 
+    # addresses as BCC - or not (False) such as Twitter, where one API call per recipient
+    # is required
+    # @todo move this to somewhere else - settings maybe. Alternatively, do it in the gateway.
+    # the twitter gateway could get called then itself cascade out the individual calls.
+    endpoints = dict([(squawk.models.SMS, True),
+                      (squawk.models.TWITTER, False),
+                      (squawk.models.EMAIL, True),
+                     ])
     
-    if sms_txlist:
-        mthd(sms_txlist, "SMS")
+    for ep in endpoint_groups.keys():
+        batch = endpoints[ep]
+        if batch:
+            mthd([t.id for t in endpoint_groups[ep]], ep)
+        else:
+            [ mthd([x.id], ep) for x in endpoint_groups[ep] ] 
 
-    if twitter_txlist:
-        for _id in twitter_txlist:
-            mthd([_id,], "TWEET")
-
-    if email_txlist:
-        mthd(email_txlist, "EMAIL")
-
-
-@task
-def transmit(txids, method="SMS"):
-    """ Destined to be run on a celery queue, txids is a list
-of TransmissionLog IDs for the entries to be SMSed. or TWEETed 
-
-method can take values SMS or TWEET
-"""
-    if method == "SMS":
-        squawk.gateway.gateway().send(txids)
-    elif method == "TWEET":
-        squawk.gateway.twitter().send(txids)
-    elif method == "EMAIL":
-        squawk.gateway.email().send(txids)
-    else:
-        raise Exception("Unknown transmit method: %s" % method)
 
 def message_contact(api_user, user_slug, message):
     """ Message a single contact. 

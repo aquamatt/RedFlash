@@ -34,4 +34,3 @@ CELERY_DEFAULT_QUEUE = "redflash"
 # set True if you don't want to consume results
 CELERY_IGNORE_RESULT = True
 CELERY_DISABLE_RATE_LIMITS = True
-CELERY_IMPORTS = ["squawk.lib",]
