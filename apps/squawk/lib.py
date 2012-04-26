@@ -70,6 +70,7 @@ def enqueue(api_user, notification_id, notification_type, notification_slug,
     endpoints = dict([(squawk.models.SMS, True),
                       (squawk.models.TWITTER, False),
                       (squawk.models.EMAIL, True),
+                      (squawk.models.WEBHOOK, False),
                      ])
     
     for ep in endpoint_groups.keys():

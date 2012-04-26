@@ -3,10 +3,9 @@
 # See LICENSE for details
 """ SMS gateway implementations
 """
-from squawk.gateway.dummy import DummyGateway
-from squawk.gateway.clickatell import ClickatellGateway
 from squawk.gateway.tweet import TwitterGateway
 from squawk.gateway.email import EmailGateway
+from squawk.gateway.webhook import WebhookGateway
 from django.conf import settings
 
 # singleton SMS Gateway instance
@@ -29,3 +28,8 @@ def email(break_cache = False):
     if break_cache or (not getattr(email, '_cache', None)):
         email._cache = EmailGateway()
     return email._cache
+
+def webhook(break_cache = False):
+    if break_cache or (not getattr(webhook, '_cache', None)):
+        webhook._cache = WebhookGateway()
+    return webhook._cache

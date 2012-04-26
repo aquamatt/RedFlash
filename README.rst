@@ -105,6 +105,32 @@ You can force synchronous behaviour be setting ``SEND_IN_PROCESS`` True in ``set
 
     python manage.py celeryd -E -linfo
 
+Notification channels
+=====================
+
+RedFlash can notify via:
+
+* SMS (via a gateway such as Clickatel)
+* Email
+* Twitter (DM is sent; the user must follow the account from which RedFlash tweets)
+* Webhook
+
+Webhooks
+--------
+
+To supply a webhook, you must set a service to receive requests at the URL specified. For example::
+
+  http://my.hooks/redflash/
+
+as a base URL would receive updates POSTed to::
+
+  http://my.hooks/redflash/<notification ID>
+
+with POST arguments 'notification_id' and 'message'
+
+
+You must respond with a 201 (200 accepted though) if the response has been accepted; a 500 if there was an error.
+
 URL API structure
 =================
 
@@ -172,6 +198,8 @@ Notes on gateways
 
 Some quick notes on gateways other than Clickatell:
 
+- Nexmo - fantastic service, and on the roadmap for a gateway class in RedFlash next
+
 - TMC (www.tmcsms.com - looks like cheap virtual numbers, but API is SOAP and
    outbound not so cheap with _from_ 5.9p / msg)
 - MessageMedia. Also appear to be SOAP only. Replies flagged to match outbound messages
@@ -181,3 +209,8 @@ Some quick notes on gateways other than Clickatell:
 - www.routomessaging.com - seems to be cheaper than clickatell. Not sure you get delivery
    receipts.
 
+ Acknowledgements
+ ================
+
+ Thanks to James Cranwell-Ward (@jcranwellward) for suggesting the Webhooks
+ feature - an inspired addition to this tool!

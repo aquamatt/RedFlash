@@ -29,7 +29,8 @@ This message is automatically generated.
 A RedFlash alert has been triggered with the following message: %s
 
 DO NOT REPLY TO THIS EMAIL. ANY MAIL SENT TO THIS ADDRESS WILL BE IGNORED.
-                    """ % tx.message,
+Notification ID: %s                    
+                    """ % (tx.message, tx.notification_id),
                     bcc = email_addresses,
                     )
             message.send(fail_silently = False)

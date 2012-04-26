@@ -29,11 +29,12 @@ class Contact(models.Model, SerializableModel):
     def __unicode__(self):
         return self.name
 
-SMS, TWITTER, EMAIL = (0,1,2)
+SMS, TWITTER, EMAIL, WEBHOOK = (0,1,2,3)
 CONTACT_TYPES = (
     (SMS, "Phone"),
     (TWITTER, "Twitter"),
     (EMAIL, "Email"),
+    (WEBHOOK, "Webhook"),
 )
 CONTACT_TYPE_DICT = dict(CONTACT_TYPES)
 
