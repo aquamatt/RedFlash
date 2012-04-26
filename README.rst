@@ -209,8 +209,8 @@ Some quick notes on gateways other than Clickatell:
 - www.routomessaging.com - seems to be cheaper than clickatell. Not sure you get delivery
    receipts.
 
- Acknowledgements
- ================
+Acknowledgements
+================
 
- Thanks to James Cranwell-Ward (@jcranwellward) for suggesting the Webhooks
- feature - an inspired addition to this tool!
+Thanks to James Cranwell-Ward (@jcranwellward) for suggesting the Webhooks
+feature - an inspired addition to this tool!
