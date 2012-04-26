@@ -110,10 +110,10 @@ Notification channels
 
 RedFlash can notify via:
 
-* SMS (via a gateway such as Clickatel)
-* Email
-* Twitter (DM is sent; the user must follow the account from which RedFlash tweets)
-* Webhook
+- SMS (via a gateway such as Clickatel)
+- Email
+- Twitter (DM is sent; the user must follow the account from which RedFlash tweets)
+- Webhook
 
 Webhooks
 --------
