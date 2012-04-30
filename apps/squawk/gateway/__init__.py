@@ -6,6 +6,11 @@
 from squawk.gateway.tweet import TwitterGateway
 from squawk.gateway.email import EmailGateway
 from squawk.gateway.webhook import WebhookGateway
+# needed for settings.SMS_GATEWAY to eval
+# @todo move to settings, something like PERMITTED_GATEWAYS
+# like apps listings
+from squawk.gateway.nexmo import NexmoGateway
+from squawk.gateway.clickatell import ClickatellGateway
 from django.conf import settings
 
 # singleton SMS Gateway instance

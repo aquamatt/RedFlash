@@ -67,6 +67,8 @@ def enqueue(api_user, notification_id, notification_type, notification_slug,
     # is required
     # @todo move this to somewhere else - settings maybe. Alternatively, do it in the gateway.
     # the twitter gateway could get called then itself cascade out the individual calls.
+
+# @todo this sucks because some SMS end-points do not take bulk requests
     endpoints = dict([(squawk.models.SMS, True),
                       (squawk.models.TWITTER, False),
                       (squawk.models.EMAIL, True),

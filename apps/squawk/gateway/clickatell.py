@@ -115,8 +115,7 @@ delivery in log.
                 pass
     
             if has_error:
-                raise squawk.GatewayFailError("Error when sending: %s" % has_error, 
-                                        notification_id = notification_id)
+                raise squawk.GatewayFailError("Error when sending: %s" % has_error, notification_id = notification_id)
                 
     def status_callback(self, callback_data):
         """ Log status information returned from the Clickatell gateway """
