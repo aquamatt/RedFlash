@@ -70,7 +70,7 @@ Usage
 
 More documentation is to come here, and there are basic installation notes in the ``INSTALL`` file. 
 For now you'll have to read the settings.py to find help with getting this running -
-it's not difficult however. Once you have a Clickatell account you're much of the way there. Twitter is also fairly straight
+it's not difficult however. Once you have a Clickatell or Nexmo (recommended) account you're much of the way there. Twitter is also fairly straight
 forward:
 
 - create a twitter account to be the sender of alerts
@@ -81,7 +81,7 @@ Twitter can be configured to SMS any direct messages and thus can be used as a c
 be a considerable delay between the sending of a tweet and the sending of the associated SMS (many, many minutes) so 
 this should not be used as a production solution for SMS.
 
-Clients simply call on the RESTful(ish) API sketched out below. If you have Clickatel sending confirmation receipts, it should
+Clients simply call on the RESTful(ish) API sketched out below. If you have Clickatel or Nexmo sending confirmation receipts, it should
 be configured to call the ``/ack`` URL. 
 
 An example Python client library can be installed from git://github.com/aquamatt/rfclient.git.
@@ -110,7 +110,7 @@ Notification channels
 
 RedFlash can notify via:
 
-- SMS (via a gateway such as Clickatel)
+- SMS (via a gateway such as Clickatel or Nexmo)
 - Email
 - Twitter (DM is sent; the user must follow the account from which RedFlash tweets)
 - Webhook
@@ -196,18 +196,19 @@ Respond with 403 invalid
 Notes on gateways
 =================
 
-Some quick notes on gateways other than Clickatell:
-
-- Nexmo - fantastic service, and on the roadmap for a gateway class in RedFlash next
+Some quick notes on gateways other than Nexmo and Clickatell:
 
 - TMC (www.tmcsms.com - looks like cheap virtual numbers, but API is SOAP and
    outbound not so cheap with _from_ 5.9p / msg)
 - MessageMedia. Also appear to be SOAP only. Replies flagged to match outbound messages
    which is nice - clickatell can't do that. Pricing not published.
 - www.bulksms.co.uk - two-way SMS without needing virtual number. Pricing more expensive
-   than clickatell
-- www.routomessaging.com - seems to be cheaper than clickatell. Not sure you get delivery
+   than clickatell and nexmo
+- www.routomessaging.com - seems to be OK pricing. Not sure you get delivery
    receipts.
+
+At the moment we recommend Nexmo highly for the features, the pricing and the straight-forward
+global delivery. It is the most recently tested SMS gateway for RedFlash.
 
 Acknowledgements
 ================
