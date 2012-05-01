@@ -3,6 +3,7 @@
 # See LICENSE for details
 """ SMS gateway implementation for Nexmo
 """
+import logging
 import re
 import squawk
 import urllib
@@ -146,3 +147,9 @@ Settings variables:
             pass
         except Exception, ex:
             pass
+
+    def inbound_callback(self, callback_data):
+        logger = logging.getLogger("redflash")
+        logger.info("Received inbound:")
+        for k,v in callback_data.items():
+            logger.info(" -- %s = %s " % (k,v))

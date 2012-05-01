@@ -7,6 +7,7 @@ from squawk.views import contact_request
 from squawk.views import group_request
 from squawk.views import event_request
 from squawk.views import delivery_status
+from squawk.views import inbound_message
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -27,4 +28,5 @@ urlpatterns = patterns('',
     (r'group/(?P<slug>[a-zA-Z0-9_\-]*)/$', group_request),
     (r'event/(?P<slug>[a-zA-Z0-9_\-]*)/$', event_request),
     (r'ack/$', delivery_status),
+    (r'inbound/$', inbound_message),
 )

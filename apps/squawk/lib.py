@@ -158,5 +158,9 @@ and one in the message_[contact|group] methods
     return notification_id
 
 def status_callback(callback_data):
-    """ Receive POST with delivery status data from the gateway """
+    """ Receive callback with delivery status data from the gateway """
     squawk.gateway.gateway().status_callback(callback_data)
+
+def inbound_callback(callback_data):
+    """ Receive callback with inbound message payload """
+    squawk.gateway.gateway().inbound_callback(callback_data)

@@ -155,3 +155,6 @@ delivery in log.
         except TransmissionLog.DoesNotExist:
             ## @todo - log this!!
             pass
+
+    def inbound_callback(self, callback_data):
+        raise NotImplementedError()

@@ -1,6 +1,7 @@
 # Copyright (c) 2010 the RedFlash project contributors
 # All Rights Reserved
 # See LICENSE for details
+import logging
 
 from django.http import HttpResponse
 from django.conf import settings
@@ -15,6 +16,7 @@ from squawk.lib import message_contact
 from squawk.lib import message_group
 from squawk.lib import fire_event
 from squawk.lib import status_callback
+from squawk.lib import inbound_callback
 from squawk.models import APIUser
 from squawk.models import Contact
 from squawk.models import ContactGroup
@@ -156,11 +158,31 @@ def event_request(request, slug):
     return response
 
 def delivery_status(request):
-    """ Handler for delivery status callbacks from gateway. Expects a POST 
-submission.
+    """ Handler for delivery status callbacks from gateway. 
 """
     callback_method = getattr(settings, 'GATEWAY_CALLBACK_METHOD', 'POST')
     if callback_method not in ['GET', 'POST']:
         callback_method = 'POST'
     status_callback(getattr(request, callback_method))
     return HttpResponse("OK", status = 200)
+
+def inbound_message(request):
+    """ Handler for INBOUND messages from the SMS gateway. If a message 
+arrives but the gateway class doesn't support it, a 200 will be returned 
+regardless (to prevent endless re-sends by the gateway) and an error will
+be logged. Response body is OK if handled, DISCARDED if not. """
+    logger = logging.getLogger("redflash")
+    callback_method = getattr(settings, 'GATEWAY_CALLBACK_METHOD', 'POST')
+    MSG = "OK"
+    if callback_method not in ['GET', 'POST']:
+        callback_method = 'POST'
+    try:
+        inbound_callback(getattr(request, callback_method))
+    except NotImplementedError, nie:
+        logger.error("Inbound message not handled by gateway handler")
+        MSG = "DISCARDED"
+    except Exception, ex:
+        logger.error("Inbound message handling error: %s" % str(ex))
+        MSG = "DISCARDED"
+    return HttpResponse(MSG, status = 200)
+    
