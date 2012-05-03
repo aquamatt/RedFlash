@@ -70,18 +70,18 @@ Usage
 
 More documentation is to come here, and there are basic installation notes in the ``INSTALL`` file. 
 For now you'll have to read the settings.py to find help with getting this running -
-it's not difficult however. Once you have a Clickatell or Nexmo (recommended) account you're much of the way there. Twitter is also fairly straight
+it's not difficult however. Once you have a Nexmo (or Clickatell) account you're much of the way there. Twitter is also fairly straight
 forward:
 
 - create a twitter account to be the sender of alerts
-- use twitter tools described in ``tweet.py`` to generate the appropriate OAuth keys and place in ``/etc/redflash.py``
+- use twitter tools described in ``tweet.py`` to generate the appropriate OAuth keys and place in ``/etc/redflash/redflash_conf.py``, or log in to dev.twitter.com with the account you want RedFlash to send from, create an application and access credentials there.
 - ensure that anyone wishing to receive twitter alerts follows the sending account
 
 Twitter can be configured to SMS any direct messages and thus can be used as a cheap and cheerful SMS gateway. Be warned that there can 
 be a considerable delay between the sending of a tweet and the sending of the associated SMS (many, many minutes) so 
 this should not be used as a production solution for SMS.
 
-Clients simply call on the RESTful(ish) API sketched out below. If you have Clickatel or Nexmo sending confirmation receipts, it should
+Clients simply call on the RESTful(ish) API sketched out below. If you have the SMS gateway sending confirmation receipts, it should
 be configured to call the ``/ack`` URL. 
 
 An example Python client library can be installed from git://github.com/aquamatt/rfclient.git.
@@ -110,7 +110,7 @@ Notification channels
 
 RedFlash can notify via:
 
-- SMS (via a gateway such as Clickatel or Nexmo)
+- SMS (via a gateway such as Nexmo)
 - Email
 - Twitter (DM is sent; the user must follow the account from which RedFlash tweets)
 - Webhook
@@ -201,7 +201,7 @@ Some quick notes on gateways other than Nexmo and Clickatell:
 - TMC (www.tmcsms.com - looks like cheap virtual numbers, but API is SOAP and
    outbound not so cheap with _from_ 5.9p / msg)
 - MessageMedia. Also appear to be SOAP only. Replies flagged to match outbound messages
-   which is nice - clickatell can't do that. Pricing not published.
+   which is nice though unclear how this is done.
 - www.bulksms.co.uk - two-way SMS without needing virtual number. Pricing more expensive
    than clickatell and nexmo
 - www.routomessaging.com - seems to be OK pricing. Not sure you get delivery

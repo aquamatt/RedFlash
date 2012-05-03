@@ -10,14 +10,14 @@ SITE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__f
 
 ######################### GATEWAY CONFIGS ##############################
 #from squawk.gateway import DummyGateway as GATEWAY
-SMS_GATEWAY = "ClickatellGateway"
-GATEWAY_URL = "https://api.clickatell.com/http/sendmsg"
+SMS_GATEWAY = "NexmoGateway"
+GATEWAY_URL = "https://rest.nexmo.com/sms/json"
 GATEWAY_USER = '<YOUR USER NAME>'
 GATEWAY_PASSWORD = '<YOUR PASSWORD>'
-GATEWAY_API_ID = '<YOUR API ID>'
+#GATEWAY_API_ID = '<YOUR API ID>'
 # if set, this is the number from which SMS appear to originate
 # With Clickatell, this must be a number registered with them
-# GATEWAY_ORIGIN_NUMBER = "<ORIGIN NUMBER>"
+GATEWAY_ORIGIN_NUMBER = "<ORIGIN NUMBER>"
 
 # Enable this if the gateway is making acknowledgement callbacks
 GATEWAY_ENABLE_ACK = False
@@ -25,13 +25,11 @@ GATEWAY_ENABLE_ACK = False
 # the gateway callsback to this application
 GATEWAY_CALLBACK_METHOD = 'POST'
 
-# this is auth for the sending account
-TWITTER_TOKEN = '<YOUR TOKEN>'
-TWITTER_KEY = '<YOUR KEY>'
-
-# this is for the application
-TWITTER_CONN_SECRET = 'uS6hO2sV6tDKIOeVjhnFnQ'
-TWITTER_CONN_SECRET_KEY = 'MEYTOS97VvlHX7K1rwHPEqVpTSqZ71HtvoK4sVuYk'
+# this is auth for the twitter sending account
+TWITTER_CONSUMER_KEY  = "REPLACE ME"
+TWITTER_CONSUMER_SECRET = "REPLACE ME"
+TWITTER_ACCESS_TOKEN = "REPLACE ME"
+TWITTER_ACCESS_SECRET = "REPLACE ME"
 
 # Causes de-queue to occur in the request-response cycle which
 # is fine for quick tests but is not suitable for production use.

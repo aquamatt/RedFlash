@@ -28,11 +28,14 @@ To generate first keys:
 
 """
     def __init__(self):
-        self.twitter = twitter.api.Twitter(auth=OAuth(settings.TWITTER_TOKEN, 
-                                   settings.TWITTER_KEY,
-                                   settings.TWITTER_CONN_SECRET,
-                                   settings.TWITTER_CONN_SECRET_KEY))
+        self.twitter = twitter.api.Twitter(
+               auth=OAuth(settings.TWITTER_ACCESS_TOKEN, 
+                   settings.TWITTER_ACCESS_SECRET,
+                   settings.TWITTER_CONSUMER_KEY,
+                   settings.TWITTER_CONSUMER_SECRET)
+               )
 
+ 
     def send(self, txrecords):
         """ Send each individually """
         # txrecords is a list of TransmissionLog IDs
