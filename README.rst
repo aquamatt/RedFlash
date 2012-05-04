@@ -74,7 +74,7 @@ it's not difficult however. Once you have a Nexmo (or Clickatell) account you're
 forward:
 
 - create a twitter account to be the sender of alerts
-- use twitter tools described in ``tweet.py`` to generate the appropriate OAuth keys and place in ``/etc/redflash/redflash_conf.py``, or log in to dev.twitter.com with the account you want RedFlash to send from, create an application and access credentials there.
+- use twitter tools described in ``tweet.py`` to generate the appropriate OAuth keys and place in ``/etc/redflash/redflash_conf.py``, or log in to https://dev.twitter.com with the account you want RedFlash to send from, create an application and access credentials there (See instructions at http://bit.ly/JXItlM).
 - ensure that anyone wishing to receive twitter alerts follows the sending account
 
 Twitter can be configured to SMS any direct messages and thus can be used as a cheap and cheerful SMS gateway. Be warned that there can 
